@@ -51,17 +51,18 @@ def api():
 def users_json():
     """Return users as a JSON Array"""
     cur = get_db().cursor()
-    cur.execute("SELECT * FROM users")
+    cur.execute("SELECT rowid, * FROM users")
     results = cur.fetchall()
     array = []
     for result in results:
         array.append(
             {
-                "name": result[0],
-                "balance": result[1],
-                "drinkCount": result[2],
-                "lastUpdate": result[3],
-                "hash": result[4],
+                "id": result[0],
+                "name": result[1],
+                "balance": result[2],
+                "drinkCount": result[3],
+                "lastUpdate": result[4],
+                "hash": result[5],
             }
         )
     return jsonify(array)
