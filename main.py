@@ -41,11 +41,30 @@ def index():
 def api():
     if request.method == "GET":
         """return a list of users"""
-        return jsonify(["OK"])
+        return users_json()
 
     if request.method == "POST":
         """modify/update the user database"""
-        return jsonify(["OK"])
+        return users_json()
+
+
+def users_json():
+    """Return users as a JSON Array"""
+    cur = get_db().cursor()
+    cur.execute("SELECT * FROM users")
+    results = cur.fetchall()
+    array = []
+    for result in results:
+        array.append(
+            {
+                "name": result[0],
+                "balance": result[1],
+                "drinkCount": result[2],
+                "lastUpdate": result[3],
+                "hash": result[4],
+            }
+        )
+    return jsonify(array)
 
 
 if __name__ == "__main__":
