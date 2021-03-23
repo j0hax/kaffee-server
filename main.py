@@ -18,6 +18,10 @@ def get_db():
     db = getattr(g, "_database", None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
+        cur = db.cursor()
+        qry = open("create_table.sql", "r").read()
+        cur.execute(qry)
+        cur.close()
     return db
 
 
@@ -46,4 +50,3 @@ def api():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    con = sqlite3.connect("coffee.db")
