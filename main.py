@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import configparser
 import sqlite3
+import time
 
 from flask import Flask, g, jsonify, redirect, request
 from flask_cors import CORS
@@ -45,8 +46,27 @@ def api():
 
     if request.method == "POST":
         """modify/update the user database"""
+        client_users = request.get_json()
+        merge_users(client_users)
         return jsonify(get_users())
 
+def merge_users(client_users):
+    """Compare and update users in the database via those from the client"""
+    cur = get_db().cursor()
+    for user in client_users:
+        # Check if user exists
+        cur.execute("SELECT EXISTS(SELECT 1 FROM users WHERE rowid = ?)", (user["id"],))
+        exists = cur.fetchone()[0]
+        
+        if exists:
+            # update our user
+            print("USER ID EXISTS:", user["id"])
+            cur.execute("UPDATE users SET name=?,balance=?,drink_count=?,last_update=?,transponder_hash=? WHERE rowid=?", (user["name"], user["balance"], user["drinkCount"], time.time(), user["hash"], user["id"]))
+        else:
+            print("Inserting user", user["name"])
+            cur.execute("INSERT INTO users VALUES (?,?,?,?,?)", (user["name"], user["balance"], user["drinkCount"], user["lastUpdate"], user["hash"]))
+    
+    get_db().commit()
 
 def get_users():
     """Return users as a JSON Array"""
