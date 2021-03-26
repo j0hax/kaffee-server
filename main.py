@@ -41,14 +41,14 @@ def index():
 def api():
     if request.method == "GET":
         """return a list of users"""
-        return users_json()
+        return jsonify(get_users())
 
     if request.method == "POST":
         """modify/update the user database"""
-        return users_json()
+        return jsonify(get_users())
 
 
-def users_json():
+def get_users():
     """Return users as a JSON Array"""
     cur = get_db().cursor()
     cur.execute("SELECT rowid, * FROM users")
@@ -65,7 +65,7 @@ def users_json():
                 "hash": result[5],
             }
         )
-    return jsonify(array)
+    return array
 
 
 if __name__ == "__main__":
