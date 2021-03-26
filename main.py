@@ -89,4 +89,6 @@ def get_users():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import bjoern
+    
+    bjoern.run(app, "", 80)
