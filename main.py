@@ -20,8 +20,8 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
         cur = db.cursor()
-        qry = open("create_table.sql", "r").read()
-        cur.execute(qry)
+        qry = open("create_tables.sql", "r").read()
+        cur.executescript(qry)
         cur.close()
     return db
 
