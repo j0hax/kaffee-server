@@ -46,9 +46,21 @@ def api():
 
     if request.method == "POST":
         """modify/update the user database"""
-        client_users = request.get_json()
-        merge_users(client_users)
+        # verify API key
+        data = request.get_json()
+        if not verify_key(data["apiKey"]):
+            print("Unauthorized request")
+            return jsonify("Error: unauthenticated"), 401
+        
+        merge_users(data['users'])
         return jsonify(get_users())
+
+def verify_key(api_key):
+    """Verifies an API key in the database"""
+    cur = get_db().cursor()
+    cur.execute("SELECT EXISTS(SELECT 1 FROM clients WHERE api_key = ?)", (api_key,))
+    return cur.fetchone()[0]
+    
 
 def merge_users(client_users):
     """Compare and update users in the database via those from the client"""
@@ -60,7 +72,7 @@ def merge_users(client_users):
         
         if exists:
             # update our user
-            print("USER ID EXISTS:", user["id"])
+            print("Updating user", user["name"])
             cur.execute("UPDATE users SET name=?,balance=?,drink_count=?,last_update=?,transponder_hash=? WHERE rowid=?", (user["name"], user["balance"], user["drinkCount"], time.time(), user["hash"], user["id"]))
         else:
             print("Inserting user", user["name"])

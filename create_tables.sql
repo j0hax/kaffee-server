@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     transponder_hash varchar(255)
 );
 
+
 CREATE TABLE IF NOT EXISTS clients (
     api_key varchar(255)
 );
