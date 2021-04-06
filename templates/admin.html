@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Übersicht{% endblock %}
+{% block content %}
+<table class="pure-table pure-table-striped" style="width: 100%">
+<thead>
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <!--<th>Transpoder MD5</th>-->
+    <th>Insgesamt Eingezahlt</th>
+    <th>Insgesamt Getrunken</th>
+    <th>Neu Einzahlen</th>
+    <th>Saldo</th>
+</tr>
+</thead>
+<tbody>
+{% for user in users %}
+<tr>
+    <td>{{ user.id }}</td>
+    <td><input type="text" value="{{ user.name }}"></td>
+    <!--<td><input type="text" value="{{ user.hash }}"></td>-->
+    <td>{{ user.balance | format_cents }}</td>
+    <td>{{ user.drinkCount }}</td>
+    <td><input type="number" value="0"></td>
+    <td>{{ (user.balance - user.drinkCount * 30) | format_cents }}</td>
+</tr>
+{% endfor %}
+<tr>
+    <td>-</td>
+    <td><input type="text" placeholder="Neuer Benutzer"></td>
+    <!--<td><input type="text" placeholder="Transponder MD5"></td>-->
+    <td><input type="number" placeholder="0"></td>
+    <td><input type="number" placeholder="0"></td>
+    <td>-</td>
+    <td>-</td>
+</tr>
+</tbody>
+</table>
+
+<input type="submit" class="pure-button pure-button-primary" style="display:block; margin: 1em auto" value="Speichern">
+{% endblock %}

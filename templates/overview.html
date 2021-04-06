@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Übersicht{% endblock %}
+{% block content %}
+
+<h1>Statistiken</h1>
+<h2>Nutzer: {{ users | length }}</h2>
+<h2>Kaffees Getrunken: {{ users | sum(attribute='drinkCount') }}</h2>
+<h2>Eingezahlt: {{ users | sum(attribute='balance') | format_cents }}</h2>
+<h2>Kasse: {{ (users | sum(attribute='balance') - users | sum(attribute='drinkCount') * 30) | format_cents }}</h2>
+
+<h1>Nutzerübersicht</h1>
+<table class="pure-table pure-table-striped" style="width: 100%">
+<thead>
+<tr>
+    <th>Name</th>
+    <th>Kaffees</th>
+    <th>Saldo</th>
+    <th>Letzte Änderung</th>
+</tr>
+</thead>
+<tbody>
+{% for user in users %}
+<tr>
+    <td>{{ user.name }}</td>
+    <td>{{ user.drinkCount }}</td>
+    <td>{{ (user.balance - user.drinkCount * 30) | format_cents }}</td>
+    <td>{{ user.lastUpdate }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

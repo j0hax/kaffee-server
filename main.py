@@ -2,8 +2,9 @@
 import configparser
 import sqlite3
 import time
+import locale
 
-from flask import Flask, g, jsonify, redirect, request
+from flask import Flask, g, jsonify, redirect, request, render_template
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -35,7 +36,12 @@ def close_connection(exception):
 
 @app.route("/")
 def index():
-    return redirect("/api")
+    return render_template("overview.html", users=get_users())
+
+
+@app.route('/admin')
+def admin():
+    return render_template("admin.html", users=get_users())
 
 
 @app.route("/api", methods=["POST", "GET"])
@@ -54,6 +60,7 @@ def api():
         
         merge_users(data['users'])
         return jsonify(get_users())
+
 
 def verify_key(api_key):
     """Verifies an API key in the database"""
@@ -80,6 +87,11 @@ def merge_users(client_users):
     
     get_db().commit()
 
+@app.template_filter('format_cents')
+def format_currency(cents):
+    return locale.currency(cents / 100)
+
+
 def get_users():
     """Return users as a JSON Array"""
     cur = get_db().cursor()
@@ -101,6 +113,8 @@ def get_users():
 
 
 if __name__ == "__main__":
+    locale.setlocale(locale.LC_ALL, 'de_DE')
+    
     import bjoern
     
     bjoern.run(app, "", 80)
