@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import configparser
+import locale
 import sqlite3
 import time
-import locale
 
-from flask import Flask, g, jsonify, redirect, request, render_template
+from flask import Flask, g, jsonify, redirect, render_template, request
 from flask_cors import CORS
 
 app = Flask(__name__)
