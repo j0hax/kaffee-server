@@ -6,6 +6,7 @@ import time
 
 from flask import Flask, g, jsonify, redirect, render_template, request
 from flask_cors import CORS
+from icecream import ic
 
 app = Flask(__name__)
 CORS(app)
@@ -41,6 +42,7 @@ def index():
 
 @app.route('/admin')
 def admin():
+    ic("Entered admin page")
     return render_template("admin.html", users=get_users())
 
 
@@ -72,6 +74,7 @@ def verify_key(api_key):
 
 def merge_users(client_users):
     """Compare and update users in the database via those from the client"""
+    ic("Merging users...")
     cur = get_db().cursor()
     for user in client_users:
         # Check if user exists
@@ -125,6 +128,8 @@ def get_users():
                 "hash": result[5],
             }
         )
+
+    ic("Retrieved list of users")
     return array
 
 
