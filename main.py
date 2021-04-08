@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import configparser
+import locale
 import sqlite3
 import time
 
-from flask import Flask, g, jsonify, redirect, request
+from flask import Flask, g, jsonify, redirect, render_template, request
 from flask_cors import CORS
+from icecream import ic
 
 app = Flask(__name__)
 CORS(app)
@@ -35,7 +37,38 @@ def close_connection(exception):
 
 @app.route("/")
 def index():
-    return redirect("/api")
+    return render_template("overview.html", users=get_users())
+
+
+@app.route("/admin")
+def admin():
+    ic("Entered admin page")
+    return render_template("admin.html", users=get_users())
+
+
+@app.route("/admin/save/user", methods=["POST"])
+def savetable():
+    ic("Saving table")
+
+    # Update our balance
+    payment = int(float(request.form["payment"]) * 100)
+    balance = int(float(request.form["balance"]) * 100) + payment
+
+    # Assume we are getting one row
+    user = [
+        {
+            "id": request.form["id"],
+            "name": request.form["name"],
+            "balance": balance,
+            "drinkCount": request.form["drink_count"],
+            "lastUpdate": time.time(),
+            "hash": request.form["transponder_hash"],
+        }
+    ]
+
+    merge_users(user)
+
+    return redirect("/admin")
 
 
 @app.route("/api", methods=["POST", "GET"])
@@ -46,39 +79,69 @@ def api():
 
     if request.method == "POST":
         """modify/update the user database"""
+        print("Recieved data:", end=" ")
         # verify API key
         data = request.get_json()
         if not verify_key(data["apiKey"]):
             print("Unauthorized request")
             return jsonify("Error: unauthenticated"), 401
-        
-        merge_users(data['users'])
+
+        print("authorized")
+        merge_users(data["users"])
         return jsonify(get_users())
+
 
 def verify_key(api_key):
     """Verifies an API key in the database"""
     cur = get_db().cursor()
     cur.execute("SELECT EXISTS(SELECT 1 FROM clients WHERE api_key = ?)", (api_key,))
     return cur.fetchone()[0]
-    
+
 
 def merge_users(client_users):
     """Compare and update users in the database via those from the client"""
+    ic("Merging users...")
     cur = get_db().cursor()
     for user in client_users:
         # Check if user exists
         cur.execute("SELECT EXISTS(SELECT 1 FROM users WHERE rowid = ?)", (user["id"],))
         exists = cur.fetchone()[0]
-        
+
         if exists:
             # update our user
             print("Updating user", user["name"])
-            cur.execute("UPDATE users SET name=?,balance=?,drink_count=?,last_update=?,transponder_hash=? WHERE rowid=?", (user["name"], user["balance"], user["drinkCount"], time.time(), user["hash"], user["id"]))
+            cur.execute(
+                "UPDATE users SET name=?,balance=?,drink_count=?,last_update=?,transponder_hash=? WHERE rowid=?",
+                (
+                    user["name"],
+                    user["balance"],
+                    user["drinkCount"],
+                    time.time(),
+                    user["hash"],
+                    user["id"],
+                ),
+            )
         else:
             print("Inserting user", user["name"])
-            cur.execute("INSERT INTO users VALUES (?,?,?,?,?)", (user["name"], user["balance"], user["drinkCount"], user["lastUpdate"], user["hash"]))
-    
+            cur.execute(
+                "INSERT INTO users VALUES (?,?,?,?,?)",
+                (
+                    user["name"],
+                    user["balance"],
+                    user["drinkCount"],
+                    user["lastUpdate"],
+                    user["hash"],
+                ),
+            )
+
     get_db().commit()
+
+
+@app.template_filter("format_cents")
+def format_currency(cents):
+    # return locale.currency(cents / 100)
+    return cents / 100
+
 
 def get_users():
     """Return users as a JSON Array"""
@@ -97,10 +160,14 @@ def get_users():
                 "hash": result[5],
             }
         )
+
+    ic("Retrieved list of users")
     return array
 
 
 if __name__ == "__main__":
+    locale.setlocale(locale.LC_ALL, "de_DE")
+
     import bjoern
-    
+
     bjoern.run(app, "", 80)

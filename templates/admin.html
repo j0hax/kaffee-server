@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Übersicht{% endblock %}
+{% block content %}
+<table class="pure-table pure-table-horizontal" style="width: 100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Transpoder MD5</th>
+            <th>Insgesamt Eingezahlt</th>
+            <th>Insgesamt Getrunken</th>
+            <th>Neu Einzahlen</th>
+            <th>Saldo</th>
+            <th>Speichern</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <form action="/admin/save/user" method="post">
+            <tr>
+                <td><input type="text" name="id" value="{{ user.id }}" readonly></td>
+                <td><input type="text" name="name" value="{{ user.name }}" required></td>
+                <td><input type="text" name="transponder_hash" value="{{ user.hash }}"></td>
+                <td><input type="text" name="balance" value="{{ user.balance | format_cents }}" readonly required></td>
+                <td><input type="text" name="drink_count" value="{{ user.drinkCount }}" readonly required></td>
+                <td><input type="number" name="payment" value="0" step="0.01" required></td>
+                <td><span class="money">{{ (user.balance - user.drinkCount * 30) | format_cents }}</span></td>
+                <td>
+                    <button type="submit" class="pure-button pure-button-primary">
+                        <ion-icon name="save"></ion-icon>
+                    </button>
+                </td>
+            </tr>
+        </form>
+        {% endfor %}
+        <form action="/admin/save/user" method="post">
+            <tr>
+                <td><input type="text" name="id" value="-" readonly></td>
+                <td><input type="text" name="name" placeholder="Neuer Benutzer" required></td>
+                <td><input type="text" name="transponder_hash"></td>
+                <td><input type="text" name="balance" value="0"></td>
+                <td><input type="text" name="drink_count" value="0"></td>
+                <td><input type="number" name="payment" value="0" step="0.01"></td>
+                <td>-</td>
+                <td>
+                    <button type="submit" class="pure-button pure-button-primary">
+                        <ion-icon name="save"></ion-icon>
+                    </button>
+                </td>
+            </tr>
+        </form>
+    </tbody>
+</table>
+
+<input type="submit" class="pure-button pure-button-primary" style="display:block; margin: 1em auto" value="Speichern">
+{% endblock %}

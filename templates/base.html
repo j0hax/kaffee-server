@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    {% block head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/pure-min.css">
+    <title>Kaffeesystem: {% block title %}{% endblock %}</title>
+    <style>
+        /* Make our forms look like they are regular text */
+        input[readonly] {
+            background-color: transparent;
+            border: 0;
+            font-size: 1em;
+        }
+
+        .money::after {
+            content: "€";
+        }
+    </style>
+    {% endblock %}
+</head>
+
+<body style="background: white">
+    <div class="pure-menu pure-menu-horizontal" style="background: #333; margin-bottom: 1em">
+        <a href="/" class="pure-menu-heading pure-menu-link">Kaffee Server</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item">
+                <a href="/" class="pure-menu-link">Übersicht</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/admin" class="pure-menu-link">Adminbereich</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/api" class="pure-menu-link">Rohdaten</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="content" style="margin: 1em">{% block content %}{% endblock %}</div>
+    <footer>
+        {% block footer %}
+        <hr>
+        <small>Nur für den internen gebrauch</small>
+        {% endblock %}
+    </footer>
+    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+</body>
+
+</html>
