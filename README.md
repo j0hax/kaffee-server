@@ -20,6 +20,13 @@ $ curl http://127.0.0.1/api
 ]
 ```
 
+## Web-Oberfläche
+
+![Überblick](screenshots/overview.png)
+![Admin-Bereich](screenshots/admin.png)
+
+Eine einfache Weboberfläche erlaubt für das Administrieren von Nutzerdaten.
+
 ## Datenbanken
 ### users
 Die Users-Datenbank dient als Speicher für Nutzerdaten wie Name, Anzahl Buchungen, etc.
