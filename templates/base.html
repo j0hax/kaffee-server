@@ -17,6 +17,14 @@
         .money::after {
             content: "€";
         }
+
+        .flashes {
+            background-color: lightblue;
+            border: 1px solid darkblue;
+            margin: 1em;
+            padding: 1em 2em;
+            border-radius: 5px;
+        }
     </style>
     {% endblock %}
 </head>
@@ -36,7 +44,17 @@
             </li>
         </ul>
     </div>
-
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+        <li>
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
     <div id="content" style="margin: 1em">{% block content %}{% endblock %}</div>
     <footer>
         {% block footer %}

@@ -3,8 +3,9 @@ import configparser
 import locale
 import sqlite3
 import time
+import os
 
-from flask import Flask, g, jsonify, redirect, render_template, request
+from flask import Flask, flash, g, jsonify, redirect, render_template, request
 from flask_cors import CORS
 from icecream import ic
 
@@ -15,6 +16,9 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 
 DATABASE = config["database"]["file"]
+
+# Create a secret key
+app.secret_key = os.urandom(16)
 
 
 def get_db():
@@ -65,6 +69,8 @@ def savetable():
             "hash": request.form["transponder_hash"],
         }
     ]
+
+    flash("Updated user " + request.form["name"])
 
     merge_users(user)
 
