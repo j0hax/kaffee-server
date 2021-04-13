@@ -4,7 +4,7 @@ import locale
 import sqlite3
 import time
 import os
-
+from datetime import datetime
 from flask import Flask, flash, g, jsonify, redirect, render_template, request
 from flask_cors import CORS
 from icecream import ic
@@ -143,10 +143,24 @@ def merge_users(client_users):
     get_db().commit()
 
 
-@app.template_filter("format_cents")
-def format_currency(cents):
-    # return locale.currency(cents / 100)
+@app.template_filter("from_cents")
+def from_cents(cents):
     return cents / 100
+
+
+@app.template_filter("pretty_currency")
+def pretty_currency(cents):
+    return locale.currency(from_cents(cents))
+
+
+@app.template_filter("pretty_date")
+def pretty_date(timestamp):
+    return datetime.fromtimestamp(timestamp).strftime("%a, %x um %X")
+
+
+@app.template_filter("pretty_number")
+def pretty_number(number):
+    return locale.format("%d", number, grouping=True)
 
 
 def get_users():
