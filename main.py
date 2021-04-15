@@ -8,6 +8,12 @@ from datetime import datetime
 from flask import Flask, flash, g, jsonify, redirect, render_template, request
 from flask_cors import CORS
 from icecream import ic
+class User(flask_login.UserMixin):
+    def check_password(self, password):
+        cur = get_db().cursor()
+        cur.execute("SELECT * FROM admins WHERE username = ?", (self.id,))
+        data = cur.fetchone()
+        return bcrypt.checkpw(password.encode(), data[1].encode())
 
 app = Flask(__name__)
 CORS(app)
