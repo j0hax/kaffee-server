@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 CREATE TABLE IF NOT EXISTS clients (
-    api_key varchar(255)
+    api_key varchar(255) NOT NULL UNIQUE
 );
