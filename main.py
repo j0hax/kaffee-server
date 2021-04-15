@@ -8,9 +8,23 @@ from datetime import datetime
 from flask import Flask, flash, g, jsonify, redirect, render_template, request
 from flask_cors import CORS
 from icecream import ic
+import bcrypt
+import flask_login
+
+
+class User(flask_login.UserMixin):
+    def check_password(self, password):
+        cur = get_db().cursor()
+        cur.execute("SELECT * FROM admins WHERE username = ?", (self.id,))
+        data = cur.fetchone()
+        return bcrypt.checkpw(password.encode(), data[1].encode())
+
 
 app = Flask(__name__)
 CORS(app)
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -44,7 +58,43 @@ def index():
     return render_template("overview.html", users=get_users())
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    cur = get_db().cursor()
+    cur.execute("SELECT * FROM admins WHERE username = ?", (user_id,))
+    data = cur.fetchone()
+    if not data:
+        return None
+
+    user = User()
+    user.id = data[0]
+
+    return user
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+
+    user = load_user(request.form["username"])
+
+    if user and user.check_password(request.form["password"]):
+        flask_login.login_user(user)
+        flash("Erfolgreich eingeloggt als " + user.get_id())
+        return redirect("/admin")
+    else:
+        flash("Falscher Nutzer oder Passwort")
+        return redirect("/login")
+
+
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    return redirect("/login?next=" + request.path)
+
+
 @app.route("/admin")
+@flask_login.login_required
 def admin():
     ic("Entered admin page")
     return render_template("admin.html", users=get_users())

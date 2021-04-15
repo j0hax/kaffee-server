@@ -8,5 +8,13 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 CREATE TABLE IF NOT EXISTS clients (
-    api_key varchar(255)
+    api_key varchar(255) NOT NULL UNIQUE
 );
+
+CREATE TABLE IF NOT EXISTS admins (
+    username varchar(255) NOT NULL UNIQUE,
+    pw_hash char(60) NOT NULL
+);
+
+-- DEFAULT: user admin, password Barista*1
+INSERT OR IGNORE INTO admins VALUES ('admin', '$2b$12$gjItohiilKXnFYDxEpA1X.dZnHjk5tEoKQnSss90JWDaeTDAMkHGa');
