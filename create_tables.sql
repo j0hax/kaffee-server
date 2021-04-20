@@ -1,11 +1,17 @@
 CREATE TABLE IF NOT EXISTS users (
-    name varchar(255),
-    balance int,
-    drink_count int,
-    last_update int,
+    name varchar(255) NOT NULL,
+    balance INTEGER DEFAULT 0,
+    drink_count INTEGER DEFAULT 0,
+    last_update FLOAT DEFAULT (strftime('%s','now')),
     transponder_hash varchar(255)
 );
 
+CREATE TABLE IF NOT EXISTS transactions (
+    user INTEGER NOT NULL,
+    amount INTEGER NOT NULL,
+    description varchar(255),
+    timestamp INTEGER DEFAULT (strftime('%s','now'))
+);
 
 CREATE TABLE IF NOT EXISTS clients (
     api_key varchar(255) NOT NULL UNIQUE
