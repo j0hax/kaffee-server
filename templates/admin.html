@@ -11,7 +11,7 @@
             <th>Insgesamt Getrunken</th>
             <th>Neu Einzahlen (€)</th>
             <th>Saldo</th>
-            <th>Speichern</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -26,9 +26,16 @@
                 <td><input type="number" name="payment" value="0" step="0.01" required></td>
                 <td><span class="money">{{ (user.balance - user.drinkCount * 30) | from_cents }}</span></td>
                 <td>
-                    <button type="submit" class="pure-button pure-button-primary">
-                        <ion-icon name="save"></ion-icon>
-                    </button>
+                    <div class="pure-button-group" role="group">
+                        <button type="submit" class="pure-button pure-button-primary" name="action" value="save">
+                            <ion-icon name="save"></ion-icon>
+                        </button>
+                        <button type="submit" class="pure-button pure-button-danger" name="action" value="delete"
+                            onclick="return confirm('Nutzer permanent löschen?')">
+                            <ion-icon name="trash"></ion-icon>
+                        </button>
+                    </div>
+                </td>
                 </td>
             </tr>
         </form>
@@ -43,7 +50,7 @@
                 <td><input type="number" name="payment" value="0" step="0.01"></td>
                 <td>-</td>
                 <td>
-                    <button type="submit" class="pure-button pure-button-primary">
+                    <button type="submit" class="pure-button pure-button-primary" name="action" value="save">
                         <ion-icon name="save"></ion-icon>
                     </button>
                 </td>

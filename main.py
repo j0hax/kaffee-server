@@ -101,7 +101,14 @@ def admin():
 
 
 @app.route("/admin/save/user", methods=["POST"])
+@flask_login.login_required
 def savetable():
+
+    if request.form["action"] == "delete":
+        delete_user(request.form["id"])
+        flash("Deleted user " + request.form["name"])
+        return redirect("/admin")
+
     ic("Saving table")
 
     # Update our balance
@@ -154,29 +161,38 @@ def verify_key(api_key):
     return cur.fetchone()[0]
 
 
+def delete_user(id):
+    cur = get_db().cursor()
+    cur.execute("DELETE FROM users WHERE rowid = ?", (id,))
+    get_db().commit()
+
+
 def merge_users(client_users):
     """Compare and update users in the database via those from the client"""
     ic("Merging users...")
     cur = get_db().cursor()
     for user in client_users:
         # Check if user exists
-        cur.execute("SELECT EXISTS(SELECT 1 FROM users WHERE rowid = ?)", (user["id"],))
-        exists = cur.fetchone()[0]
+        cur.execute("SELECT * FROM users WHERE rowid = ?", (user["id"],))
+        data = cur.fetchone()
 
-        if exists:
-            # update our user
-            print("Updating user", user["name"])
-            cur.execute(
-                "UPDATE users SET name=?,balance=?,drink_count=?,last_update=?,transponder_hash=? WHERE rowid=?",
-                (
-                    user["name"],
-                    user["balance"],
-                    user["drinkCount"],
-                    time.time(),
-                    user["hash"],
-                    user["id"],
-                ),
-            )
+        if data:
+            if user['lastUpdate'] > data[3]:
+                # update our user
+                print("Updating user", data[0])
+                cur.execute(
+                    "UPDATE users SET name=?,balance=?,drink_count=?,last_update=?,transponder_hash=? WHERE rowid=?",
+                    (
+                        user["name"],
+                        user["balance"],
+                        user["drinkCount"],
+                        time.time(),
+                        user["hash"],
+                        user["id"],
+                    ),
+                )
+            else:
+                print("Found but not updating user", data[0])
         else:
             print("Inserting user", user["name"])
             cur.execute(

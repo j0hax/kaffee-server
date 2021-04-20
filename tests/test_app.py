@@ -1,6 +1,7 @@
 import json
 
 import sqlite3
+import time
 from main import app, get_db
 
 
@@ -8,14 +9,7 @@ def test_start():
     response = app.test_client().get("/api")
 
     assert response.status_code == 200
-
-
-def test_database():
-    cur = sqlite3.connect('coffee.db').cursor()
-    qry = open("tests/test_row.sql", "r").read()
-    cur.executescript(qry)
-    cur.close()
-
+    
 
 def test_read():
     response = app.test_client().get("/api")
@@ -24,11 +18,13 @@ def test_read():
 
 
 def test_update():
+    timestamp = time.time()
+
     payload = [{"balance": 9000,
                 "drinkCount": 30,
                 "hash": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
                 "id": 1,
-                "lastUpdate": 1616759150.347016,
+                "lastUpdate": timestamp,
                 "name": "Test User"}]
     update_payload = [
         {
@@ -36,7 +32,7 @@ def test_update():
             "drinkCount": 31,
             "hash": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
             "id": 1,
-            "lastUpdate": 1616759150.347016,
+            "lastUpdate": timestamp + 1,
             "name": "Test User"}]
 
     # Insert user data

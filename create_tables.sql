@@ -16,5 +16,8 @@ CREATE TABLE IF NOT EXISTS admins (
     pw_hash char(60) NOT NULL
 );
 
--- DEFAULT: user admin, password Barista*1
+-- DEFAULT Admin account: user admin, password Barista*1
 INSERT OR IGNORE INTO admins VALUES ('admin', '$2b$12$gjItohiilKXnFYDxEpA1X.dZnHjk5tEoKQnSss90JWDaeTDAMkHGa');
+
+-- DEFAULT API Key: ugabNkEtmjCwZeb69BrO4L1sHhgQY/X6 (use 'cat /dev/random | base64 | head -c 32' to generate a new one)
+INSERT OR IGNORE into clients VALUES ('ugabNkEtmjCwZeb69BrO4L1sHhgQY/X6')
