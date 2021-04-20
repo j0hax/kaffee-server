@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     user INTEGER NOT NULL,
     amount INTEGER NOT NULL,
     description varchar(255),
-    timestamp INTEGER DEFAULT (strftime('%s','now'))
+    timestamp FLOAT DEFAULT (strftime('%s','now'))
 );
 
 CREATE TABLE IF NOT EXISTS clients (
