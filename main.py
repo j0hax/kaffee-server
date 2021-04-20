@@ -193,7 +193,7 @@ def merge_users(client_users):
         data = cur.fetchone()
 
         if data:
-            if user['lastUpdate'] > data[3]:
+            if user["lastUpdate"] > data[3]:
                 # update our user
                 print("Updating user", data[0])
                 cur.execute(
@@ -230,20 +230,22 @@ def insert_transactions(pending: list):
     for transaction in pending:
         insert_transaction(transaction)
 
+
 def insert_transaction(transaction: dict):
     """Insert a transaction into the database"""
     ic(transaction)
     cur = get_db().cursor()
     cur.execute(
-                "INSERT INTO transactions VALUES (?,?,?,?)",
-                (
-                    transaction["user"],
-                    transaction["amount"],
-                    transaction["description"],
-                    transaction["timestamp"],
-                ),
-            )
+        "INSERT INTO transactions VALUES (?,?,?,?)",
+        (
+            transaction["user"],
+            transaction["amount"],
+            transaction["description"],
+            transaction["timestamp"],
+        ),
+    )
     get_db().commit()
+
 
 @app.template_filter("from_cents")
 def from_cents(cents):
