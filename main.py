@@ -136,6 +136,7 @@ def savetable():
 
 @app.route("/api", methods=["POST", "GET"])
 def api():
+    """Update or return an array of user statistics"""
     if request.method == "GET":
         """return a list of users"""
         return jsonify(get_users())
@@ -152,6 +153,21 @@ def api():
         print("authorized")
         merge_users(data["users"])
         return jsonify(get_users())
+
+
+@app.route("/api/transactions", methods=["POST"])
+def process_transactions():
+    """Process an array of pending transactions"""
+    print("Recieved data:", end=" ")
+    # verify API key
+    data = request.get_json()
+    if not verify_key(data["apiKey"]):
+        print("Unauthorized request")
+        return jsonify("Error: unauthenticated"), 401
+
+    print("authorized")
+    insert_transactions(data["transactions"])
+    return jsonify(get_users())
 
 
 def verify_key(api_key):
@@ -208,6 +224,26 @@ def merge_users(client_users):
 
     get_db().commit()
 
+
+def insert_transactions(pending: list):
+    """Insert a list of transactions"""
+    for transaction in pending:
+        insert_transaction(transaction)
+
+def insert_transaction(transaction: dict):
+    """Insert a transaction into the database"""
+    ic(transaction)
+    cur = get_db().cursor()
+    cur.execute(
+                "INSERT INTO transactions VALUES (?,?,?,?)",
+                (
+                    transaction["user"],
+                    transaction["amount"],
+                    transaction["description"],
+                    transaction["timestamp"],
+                ),
+            )
+    get_db().commit()
 
 @app.template_filter("from_cents")
 def from_cents(cents):
