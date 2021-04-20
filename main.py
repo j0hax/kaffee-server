@@ -232,7 +232,7 @@ def pretty_number(number):
 def get_users():
     """Return users as a JSON Array"""
     cur = get_db().cursor()
-    cur.execute("SELECT rowid, * FROM users")
+    cur.execute("SELECT rowid, * FROM users ORDER BY drink_count DESC")
     results = cur.fetchall()
     array = []
     for result in results:
