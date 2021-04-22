@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import configparser
 import locale
 import sqlite3
 import time
@@ -26,10 +25,7 @@ CORS(app)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
-config = configparser.ConfigParser()
-config.read("config.ini")
-
-DATABASE = config["database"]["file"]
+app.config.from_object("config.ProductionConfig")
 
 # Create a secret key
 app.secret_key = os.urandom(16)
@@ -38,7 +34,7 @@ app.secret_key = os.urandom(16)
 def get_db():
     db = getattr(g, "_database", None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
+        db = g._database = sqlite3.connect(app.config["DATABASE"])
         cur = db.cursor()
         qry = open("create_tables.sql", "r").read()
         cur.executescript(qry)
@@ -183,6 +179,12 @@ def delete_user(id):
     get_db().commit()
 
 
+def get_user_balance(id):
+    cur = get_db().cursor()
+    cur.execute("SELECT SUM(amount) FROM transactions WHERE user = ", (id,))
+    return cur.fetchone()[0]
+
+
 def merge_users(client_users):
     """Compare and update users in the database via those from the client"""
     ic("Merging users...")
@@ -294,4 +296,4 @@ if __name__ == "__main__":
 
     import bjoern
 
-    bjoern.run(app, "", 80)
+    bjoern.run(app, "", 8080)
