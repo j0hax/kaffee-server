@@ -1,11 +1,13 @@
 import json
 
 import sqlite3
+import random
 import time
 from main import app, get_db
 import tempfile
 
 app.config["DATABASE"] = tempfile.NamedTemporaryFile(delete=False).name
+print("Using", app.config["DATABASE"])
 
 
 def test_start():
@@ -21,25 +23,38 @@ def test_read():
 
 
 def test_transaction():
+    """ Write thousands of test transactions"""
 
-    payload = [
-        {
-            "user": 1,
-            "amount": -30,
-            "description": "test 1",
-            "timestamp": time.time(),
-        },
-        {
-            "user": 2,
-            "amount": -30,
-            "description": "test 2",
-            "timestamp": time.time(),
-        },
-    ]
+    # 10000 requests
+    for i in range(1000):
+        payload = []
 
-    # Insert user data
-    response = app.test_client().post(
-        "/api/transactions",
-        json={"apiKey": "ugabNkEtmjCwZeb69BrO4L1sHhgQY/X6", "transactions": payload},
-    )
-    data = json.loads(response.data.decode())
+        # Each with 1 - 100 pending transaction
+        for i in range(random.randint(1, 100)):
+            # 1% chance that a user will deposit between 1 and 50 EUR
+            amount = 0
+            if random.random() < (1 / 100):
+                amount = random.randint(1, 50) * 100
+            else:
+                amount = -30
+
+            payload.append(
+                {
+                    "user": random.randint(1, 100),
+                    "amount": amount,
+                    "description": "AUTOMATED",
+                    "timestamp": time.time(),
+                }
+            )
+
+        # Insert user data
+        response = app.test_client().post(
+            "/api/transactions",
+            json={
+                "apiKey": "ugabNkEtmjCwZeb69BrO4L1sHhgQY/X6",
+                "transactions": payload,
+            },
+        )
+
+        # Shouldn't be a problem
+        assert response.status_code == 200
