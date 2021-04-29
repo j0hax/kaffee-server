@@ -16,7 +16,7 @@ class User(flask_login.UserMixin):
         cur = get_db().cursor()
         cur.execute("SELECT * FROM admins WHERE username = ?", (self.id,))
         data = cur.fetchone()
-        return bcrypt.checkpw(password.encode(), data[1].encode())
+        return bcrypt.checkpw(password.encode(), data["pw_hash"].encode())
 
 
 app = Flask(__name__)
@@ -32,9 +32,17 @@ app.secret_key = os.urandom(16)
 
 
 def get_db():
+    def dict_factory(cursor, row):
+        """ Returns a dict for a selected row """
+        d = {}
+        for idx, col in enumerate(cursor.description):
+            d[col[0]] = row[idx]
+        return d
+
     db = getattr(g, "_database", None)
     if db is None:
         db = g._database = sqlite3.connect(app.config["DATABASE"])
+        db.row_factory = dict_factory
         cur = db.cursor()
         qry = open("create_tables.sql", "r").read()
         cur.executescript(qry)
@@ -63,7 +71,7 @@ def load_user(user_id):
         return None
 
     user = User()
-    user.id = data[0]
+    user.id = data["username"]
 
     return user
 
@@ -99,34 +107,39 @@ def admin():
 @app.route("/admin/save/user", methods=["POST"])
 @flask_login.login_required
 def savetable():
-
     if request.form["action"] == "delete":
         delete_user(request.form["id"])
         flash("Deleted user " + request.form["name"])
         return redirect("/admin")
-
-    ic("Saving table")
-
-    # Update our balance
-    payment = int(float(request.form["payment"]) * 100)
-    balance = int(float(request.form["balance"]) * 100) + payment
 
     # Assume we are getting one row
     user = [
         {
             "id": request.form["id"],
             "name": request.form["name"],
-            "balance": balance,
-            "drinkCount": request.form["drink_count"],
             "lastUpdate": time.time(),
             "hash": request.form["transponder_hash"],
         }
     ]
 
-    flash("Updated user " + request.form["name"])
+    ic(user)
 
     merge_users(user)
 
+    # Check if a deposit was made
+    if "payment" in request.form:
+        payment = round(float(request.form["payment"]) * 100)
+        if payment > 0:
+            ic(payment)
+            db = get_db()
+            c = db.cursor()
+            c.execute(
+                "INSERT INTO transactions (user, amount, description) VALUES (?,?,?)",
+                (user[0]["id"], payment, "Einzahlung durch Adminbereich"),
+            )
+            db.commit()
+
+    flash("Updated user " + request.form["name"])
     return redirect("/admin")
 
 
@@ -179,12 +192,6 @@ def delete_user(id):
     get_db().commit()
 
 
-def get_user_balance(id):
-    cur = get_db().cursor()
-    cur.execute("SELECT SUM(amount) FROM transactions WHERE user = ", (id,))
-    return cur.fetchone()[0]
-
-
 def merge_users(client_users):
     """Compare and update users in the database via those from the client"""
     ic("Merging users...")
@@ -195,15 +202,13 @@ def merge_users(client_users):
         data = cur.fetchone()
 
         if data:
-            if user["lastUpdate"] > data[3]:
+            if user["lastUpdate"] > data["last_update"]:
                 # update our user
-                print("Updating user", data[0])
+                print("Updating user", data["name"])
                 cur.execute(
-                    "UPDATE users SET name=?,balance=?,drink_count=?,last_update=?,transponder_hash=? WHERE rowid=?",
+                    "UPDATE users SET name=?,last_update=?,transponder_hash=? WHERE rowid=?",
                     (
                         user["name"],
-                        user["balance"],
-                        user["drinkCount"],
                         time.time(),
                         user["hash"],
                         user["id"],
@@ -214,11 +219,9 @@ def merge_users(client_users):
         else:
             print("Inserting user", user["name"])
             cur.execute(
-                "INSERT INTO users VALUES (?,?,?,?,?)",
+                "INSERT INTO users VALUES (?,?,?)",
                 (
                     user["name"],
-                    user["balance"],
-                    user["drinkCount"],
                     user["lastUpdate"],
                     user["hash"],
                 ),
@@ -237,6 +240,14 @@ def insert_transaction(transaction: dict):
     """Insert a transaction into the database"""
     ic(transaction)
     cur = get_db().cursor()
+
+    # Insert a user if he is not known
+    cur.execute(
+        "INSERT INTO users (name, last_update) VALUES (?,?)",
+        ("unknown user", transaction["timestamp"]),
+    )
+
+    # Insert transaction
     cur.execute(
         "INSERT INTO transactions VALUES (?,?,?,?)",
         (
@@ -251,6 +262,8 @@ def insert_transaction(transaction: dict):
 
 @app.template_filter("from_cents")
 def from_cents(cents):
+    if not cents:
+        return 0
     return cents / 100
 
 
@@ -270,20 +283,23 @@ def pretty_number(number):
 
 
 def get_users():
-    """Return users as a JSON Array"""
+    """Return users with balances as a JSON Array"""
     cur = get_db().cursor()
-    cur.execute("SELECT rowid, * FROM users ORDER BY drink_count DESC")
+    cur.execute(
+        "SELECT users.rowid,* FROM users LEFT JOIN balances ON users.rowid = balances.id ORDER BY balances.withdrawals DESC"
+    )
     results = cur.fetchall()
     array = []
     for result in results:
         array.append(
             {
-                "id": result[0],
-                "name": result[1],
-                "balance": result[2],
-                "drinkCount": result[3],
-                "lastUpdate": result[4],
-                "hash": result[5],
+                "id": result["rowid"],
+                "name": result["name"],
+                "balance": result["balance"] or 0,
+                "withdrawals": result["withdrawals"] or 0,
+                "deposits": result["deposits"] or 0,
+                "lastUpdate": result["last_update"],
+                "hash": result["transponder_hash"],
             }
         )
 
