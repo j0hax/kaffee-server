@@ -311,7 +311,7 @@ def get_users():
     """Return users with balances as a JSON Array"""
     cur = get_db().cursor()
     cur.execute(
-        "SELECT users.rowid, * FROM users LEFT JOIN balances ON users.rowid = balances.id ORDER BY balances.withdrawals DESC"
+        "SELECT users.rowid, * FROM users LEFT JOIN balances ON users.rowid = balances.id ORDER BY withdrawal_count DESC"
     )
     results = cur.fetchall()
     array = []
