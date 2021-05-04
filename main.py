@@ -4,11 +4,22 @@ import sqlite3
 import time
 import os
 from datetime import datetime
-from flask import Flask, flash, g, jsonify, redirect, render_template, request
+from flask import (
+    Flask,
+    flash,
+    g,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_file,
+)
 from flask_cors import CORS
 from icecream import ic
 import bcrypt
 import flask_login
+import csv
+import tempfile
 
 
 class User(flask_login.UserMixin):
@@ -104,6 +115,20 @@ def admin():
     return render_template("admin.html", users=get_users())
 
 
+@app.route("/admin/dump/users")
+def dump_users():
+    """Downloads a CSV of user data"""
+    outfile = tempfile.NamedTemporaryFile(mode="w")
+    users = get_users()
+
+    dict_writer = csv.DictWriter(outfile, users[0].keys())
+    dict_writer.writeheader()
+    dict_writer.writerows(users)
+    outfile.flush()
+
+    return send_file(outfile.name, as_attachment=True, attachment_filename="users.csv")
+
+
 @app.route("/admin/save/user", methods=["POST"])
 @flask_login.login_required
 def savetable():
@@ -128,6 +153,7 @@ def savetable():
 
     # Check if a deposit was made
     if "payment" in request.form:
+        # TODO: ensure there are no float innaccuracies
         payment = round(float(request.form["payment"]) * 100)
         if payment > 0:
             ic(payment)
@@ -206,10 +232,9 @@ def merge_users(client_users):
                 # update our user
                 print("Updating user", data["name"])
                 cur.execute(
-                    "UPDATE users SET name=?,last_update=?,transponder_hash=? WHERE rowid=?",
+                    "UPDATE users SET name=?,transponder_hash=? WHERE rowid=?",
                     (
                         user["name"],
-                        time.time(),
                         user["hash"],
                         user["id"],
                     ),
@@ -286,7 +311,7 @@ def get_users():
     """Return users with balances as a JSON Array"""
     cur = get_db().cursor()
     cur.execute(
-        "SELECT users.rowid,* FROM users LEFT JOIN balances ON users.rowid = balances.id ORDER BY balances.withdrawals DESC"
+        "SELECT users.rowid, * FROM users LEFT JOIN balances ON users.rowid = balances.id ORDER BY balances.withdrawals DESC"
     )
     results = cur.fetchall()
     array = []
@@ -296,6 +321,8 @@ def get_users():
                 "id": result["rowid"],
                 "name": result["name"],
                 "balance": result["balance"] or 0,
+                "withdrawalCount": result["withdrawal_count"] or 0,
+                "depositCount": result["deposit_count"] or 0,
                 "withdrawals": result["withdrawals"] or 0,
                 "deposits": result["deposits"] or 0,
                 "lastUpdate": result["last_update"],
