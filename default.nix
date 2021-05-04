@@ -4,5 +4,5 @@ pkgs.python3Packages.buildPythonApplication {
   pname = "Kaffeesystem";
   src = ./.;
   version = "0.1";
-  propagatedBuildInputs = with pkgs.python3Packages; [ flask flask-cors ];
+  propagatedBuildInputs = with pkgs.python3Packages; [ flask flask-cors flask_login icecream bcrypt bjoern ];
 }
