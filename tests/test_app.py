@@ -50,10 +50,8 @@ def test_transaction():
         # Insert user data
         response = app.test_client().post(
             "/api/transactions",
-            json={
-                "apiKey": "ugabNkEtmjCwZeb69BrO4L1sHhgQY/X6",
-                "transactions": payload,
-            },
+            headers={'X-API-KEY': 'ugabNkEtmjCwZeb69BrO4L1sHhgQY/X6'},
+            json=payload,
         )
 
         # Shouldn't be a problem
