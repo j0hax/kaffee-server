@@ -111,7 +111,6 @@ def unauthorized_callback():
 @app.route("/admin")
 @flask_login.login_required
 def admin():
-    ic("Entered admin page")
     return render_template("admin.html", users=get_users())
 
 
@@ -147,8 +146,6 @@ def savetable():
         }
     ]
 
-    ic(user)
-
     merge_users(user)
 
     # Check if a deposit was made
@@ -156,7 +153,6 @@ def savetable():
         # TODO: ensure there are no float innaccuracies
         payment = round(float(request.form["payment"]) * 100)
         if payment > 0:
-            ic(payment)
             db = get_db()
             c = db.cursor()
             c.execute(
@@ -169,47 +165,36 @@ def savetable():
     return redirect("/admin")
 
 
-@app.route("/api", methods=["POST", "GET"])
+@app.route("/api")
 def api():
     """Update or return an array of user statistics"""
     if request.method == "GET":
         """return a list of users"""
         return jsonify(get_users())
 
-    if request.method == "POST":
-        """modify/update the user database"""
-        print("Recieved data:", end=" ")
-        # verify API key
-        data = request.get_json()
-        if not verify_key(data["apiKey"]):
-            print("Unauthorized request")
-            return jsonify("Error: unauthenticated"), 401
-
-        print("authorized")
-        merge_users(data["users"])
-        return jsonify(get_users())
-
 
 @app.route("/api/transactions", methods=["POST"])
 def process_transactions():
     """Process an array of pending transactions"""
-    print("Recieved data:", end=" ")
-    # verify API key
+
     data = request.get_json()
-    if not verify_key(data["apiKey"]):
+
+    # verify API key
+    if not verify_key(request.headers["X-API-KEY"]):
         print("Unauthorized request")
         return jsonify("Error: unauthenticated"), 401
 
-    print("authorized")
-    insert_transactions(data["transactions"])
+    insert_transactions(data)
     return jsonify(get_users())
 
 
-def verify_key(api_key):
+def verify_key(api_key: str):
     """Verifies an API key in the database"""
     cur = get_db().cursor()
-    cur.execute("SELECT EXISTS(SELECT 1 FROM clients WHERE api_key = ?)", (api_key,))
-    return cur.fetchone()[0]
+    cur.execute(
+        "SELECT EXISTS(SELECT 1 FROM clients WHERE api_key = ?) AS result", (api_key,)
+    )
+    return cur.fetchone()["result"]
 
 
 def delete_user(id):
@@ -220,7 +205,6 @@ def delete_user(id):
 
 def merge_users(client_users):
     """Compare and update users in the database via those from the client"""
-    ic("Merging users...")
     cur = get_db().cursor()
     for user in client_users:
         # Check if user exists
@@ -263,14 +247,7 @@ def insert_transactions(pending: list):
 
 def insert_transaction(transaction: dict):
     """Insert a transaction into the database"""
-    ic(transaction)
     cur = get_db().cursor()
-
-    # Insert a user if he is not known
-    cur.execute(
-        "INSERT INTO users (name, last_update) VALUES (?,?)",
-        ("unknown user", transaction["timestamp"]),
-    )
 
     # Insert transaction
     cur.execute(
@@ -330,7 +307,6 @@ def get_users():
             }
         )
 
-    ic("Retrieved list of users")
     return array
 
 
