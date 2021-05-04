@@ -304,7 +304,7 @@ def pretty_date(timestamp):
 
 @app.template_filter("pretty_number")
 def pretty_number(number):
-    return locale.format("%d", number, grouping=True)
+    return locale.format_string("%d", number, grouping=True)
 
 
 def get_users():
