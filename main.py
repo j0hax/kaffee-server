@@ -43,7 +43,7 @@ app.secret_key = os.urandom(16)
 
 
 def get_db():
-    def dict_factory(cursor, row):
+    def dict_factory(cursor: sqlite3.Cursor, row: list) -> dict:
         """ Returns a dict for a selected row """
         d = {}
         for idx, col in enumerate(cursor.description):
@@ -188,7 +188,7 @@ def process_transactions():
     return jsonify(get_users())
 
 
-def verify_key(api_key: str):
+def verify_key(api_key: str) -> bool:
     """Verifies an API key in the database"""
     cur = get_db().cursor()
     cur.execute(
@@ -197,13 +197,13 @@ def verify_key(api_key: str):
     return cur.fetchone()["result"]
 
 
-def delete_user(id):
+def delete_user(id: int):
     cur = get_db().cursor()
     cur.execute("DELETE FROM users WHERE rowid = ?", (id,))
     get_db().commit()
 
 
-def merge_users(client_users):
+def merge_users(client_users: list):
     """Compare and update users in the database via those from the client"""
     cur = get_db().cursor()
     for user in client_users:
@@ -263,29 +263,29 @@ def insert_transaction(transaction: dict):
 
 
 @app.template_filter("from_cents")
-def from_cents(cents):
+def from_cents(cents: int) -> float:
     if not cents:
         return 0
     return cents / 100
 
 
 @app.template_filter("pretty_currency")
-def pretty_currency(cents):
+def pretty_currency(cents: int) -> str:
     return locale.currency(from_cents(cents))
 
 
 @app.template_filter("pretty_date")
-def pretty_date(timestamp):
+def pretty_date(timestamp: float) -> str:
     return datetime.fromtimestamp(timestamp).strftime("%a, %x um %X")
 
 
 @app.template_filter("pretty_number")
-def pretty_number(number):
+def pretty_number(number: float) -> str:
     return locale.format_string("%d", number, grouping=True)
 
 
-def get_users():
-    """Return users with balances as a JSON Array"""
+def get_users() -> dict:
+    """Return users with balances as a dict for sending to a client or further processing"""
     cur = get_db().cursor()
     cur.execute(
         "SELECT users.rowid, * FROM users LEFT JOIN balances ON users.rowid = balances.id ORDER BY withdrawal_count DESC"
