@@ -5,6 +5,13 @@ CREATE TABLE IF NOT EXISTS users (
     transponder_hash varchar(255)
 );
 
+CREATE TRIGGER IF NOT EXISTS update_last_update
+    AFTER UPDATE
+    ON users
+    BEGIN
+    UPDATE users SET last_update = strftime('%s','now') WHERE rowid = old.rowid;
+    END;
+
 -- Transactions from users
 CREATE TABLE IF NOT EXISTS transactions (
     user INTEGER NOT NULL,
@@ -19,7 +26,15 @@ CREATE TABLE IF NOT EXISTS clients (
 );
 
 -- View which calculates balances from transactions
-CREATE VIEW IF NOT EXISTS balances AS SELECT users.rowid AS id, sum(CASE WHEN transactions.amount > 0 then 1 else 0 end) AS deposits, sum(CASE WHEN transactions.amount < 0 then 1 else 0 end) AS withdrawals, SUM(transactions.amount) AS balance FROM transactions INNER JOIN users ON transactions.user = users.rowid GROUP BY users.rowid;
+DROP VIEW IF EXISTS balances;
+CREATE VIEW balances AS
+    SELECT users.rowid AS id,
+    sum(CASE WHEN transactions.amount > 0 THEN 1 ELSE 0 END) AS deposit_count,
+    sum(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) AS deposits,
+    sum(CASE WHEN transactions.amount < 0 THEN 1 ELSE 0 END) AS withdrawal_count,
+    sum(CASE WHEN transactions.amount < 0 THEN transactions.amount ELSE 0 END) AS withdrawals,
+    SUM(transactions.amount) AS balance FROM transactions
+    INNER JOIN users ON transactions.user = users.rowid GROUP BY users.rowid;
 
 -- Admins allowed to log and administer 
 CREATE TABLE IF NOT EXISTS admins (
