@@ -7,16 +7,19 @@ REST-Schnittstelle für das [Kaffeesystem](https://github.com/j0hax/kaffee-ui)
 
 ## Anwendungsbeispiel
 ```console
-$ curl http://127.0.0.1/api
+$ curl http://server:8080/api
 [
    {
-      "balance":9001,
-      "drinkCount":42,
-      "hash":"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      "balance":1310,
+      "depositCount":1,
+      "deposits":2000,
+      "hash":"3c39d55b2adac67d15a69e6f5f828c1a",
       "id":1,
-      "lastUpdate":1617281972.4809017,
-      "name":"Johannes Arnold"
-   }
+      "lastUpdate":1620142207.0,
+      "name":"Buxe",
+      "withdrawalCount":23,
+      "withdrawals":-690
+   },
 ]
 ```
 
@@ -28,14 +31,37 @@ $ curl http://127.0.0.1/api
 Eine einfache Weboberfläche erlaubt für das Administrieren von Nutzerdaten.
 
 ## Datenbanken
+
 ### users
-Die Users-Datenbank dient als Speicher für Nutzerdaten wie Name, Anzahl Buchungen, etc.
+Die Users-Datenbank dient als Speicher für Nutzerdaten wie Name und Transponder Hash.
 
 ```console
-$ sqlite3 -header -column coffee.db "SELECT * FROM users;"
-name             balance     drink_count  last_update         transponder_hash                                                
----------------  ----------  -----------  ------------------  ----------------------------------------------------------------
-Johannes Arnold  90001       42           1617281972.4809017  9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+$ sqlite3 -header -column coffee.db "SELECT rowid, * FROM users;"
+rowid  name      last_update       transponder_hash
+-----  --------  ----------------  --------------------------------
+1      Buxe      1620142207.0      3c39d55b2adac67d15a69e6f5f828c1a
+```
+
+### transactions
+Die Transactions-Datenbank dient als Aufzeichnung aller Zu- und Abbuchungen.
+
+```console
+$ sqlite3 -header -column coffee.db "SELECT * FROM transactions WHERE user = 1;
+user  amount  description                    timestamp     
+----  ------  -----------------------------  --------------
+1     -30     Buchung vom Kaffeesysem        16201415012.45
+1     2000    Einzahlung durch Adminbereich  1620142207.0  
+1     -30     Buchung vom Kaffeesysem        16201422243.59
+```
+
+### balances
+Ein View, welcher Transaktionen zusammenzählt und Nutzern zuordnet.
+
+```console
+$ sqlite3 -header -column coffee.db "SELECT * FROM balances;
+user  deposit_count  deposits  withdrawal_count  withdrawals  balance
+----  -------------  --------  ----------------  -----------  -------
+1     1              2000      23                -690         1310 
 ```
 
 ### clients
