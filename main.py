@@ -19,6 +19,9 @@ import bcrypt
 import flask_login
 import csv
 import tempfile
+import logging
+
+logging.basicConfig(filename="kaffesystem.log", level=logging.INFO)
 
 
 class User(flask_login.UserMixin):
@@ -91,13 +94,20 @@ def login():
     if request.method == "GET":
         return render_template("login.html")
 
-    user = load_user(request.form["username"])
+    app.logger.info(f"Login Anfrage von {request.host}")
+
+    username = request.form["username"]
+
+    user = load_user(username)
 
     if user and user.check_password(request.form["password"]):
         flask_login.login_user(user)
         flash("Erfolgreich eingeloggt als " + user.get_id())
         return redirect("/admin")
     else:
+        app.logger.warning(
+            f"Fehlgeschlagener Login-Versuch für Nutzer {username} von {request.host}"
+        )
         flash("Falscher Nutzer oder Passwort")
         return redirect("/login")
 
@@ -110,6 +120,7 @@ def unauthorized_callback():
 @app.route("/admin")
 @flask_login.login_required
 def admin():
+    app.logger.info(f"{request.host} hat den Adminbereich betreten")
     return render_template("admin.html", users=get_users())
 
 
@@ -130,16 +141,21 @@ def dump_users():
 @app.route("/admin/save/user", methods=["POST"])
 @flask_login.login_required
 def savetable():
+
+    user_id = request.form["id"]
+    user_name = request.form["name"]
+
     if request.form["action"] == "delete":
-        delete_user(request.form["id"])
-        flash("Deleted user " + request.form["name"])
+        app.logger.info(f"{request.host} löscht Nutzer {user_name} ({user_id})")
+        delete_user(user_id)
+        flash("Deleted user " + user_name)
         return redirect("/admin")
 
     # Assume we are getting one row
     user = [
         {
-            "id": request.form["id"],
-            "name": request.form["name"],
+            "id": user_id,
+            "name": user_name,
             "lastUpdate": time.time(),
             "hash": request.form["transponder_hash"],
         }
@@ -152,6 +168,9 @@ def savetable():
         # TODO: ensure there are no float innaccuracies
         payment = round(float(request.form["payment"]) * 100)
         if payment > 0:
+            app.logger.info(
+                f"{request.host} zahlt für {user_name} ({user_id}) {payment/100} ein"
+            )
             db = get_db()
             c = db.cursor()
             c.execute(
@@ -166,10 +185,9 @@ def savetable():
 
 @app.route("/api")
 def api():
-    """Update or return an array of user statistics"""
-    if request.method == "GET":
-        """return a list of users"""
-        return jsonify(get_users())
+    """return a list of users"""
+    app.logger.debug(f"{request.host} fragt nach Nutzern")
+    return jsonify(get_users())
 
 
 @app.route("/api/transactions", methods=["POST"])
@@ -180,6 +198,7 @@ def process_transactions():
 
     # verify API key
     if not verify_key(request.headers["X-API-KEY"]):
+        app.logger.warn(f"{request.host} bucht mit falschem API Key")
         print("Unauthorized request")
         return jsonify("Error: unauthenticated"), 401
 
@@ -212,8 +231,10 @@ def merge_users(client_users: list):
 
         if data:
             if user["lastUpdate"] > data["last_update"]:
+                app.logger.info(
+                    f"Daten für Nutzer {user['name']} ({user['id']}) werden aktualisiert"
+                )
                 # update our user
-                print("Updating user", data["name"])
                 cur.execute(
                     "UPDATE users SET name=?,transponder_hash=? WHERE rowid=?",
                     (
@@ -222,10 +243,8 @@ def merge_users(client_users: list):
                         user["id"],
                     ),
                 )
-            else:
-                print("Found but not updating user", data[0])
         else:
-            print("Inserting user", user["name"])
+            app.logger.info(f"Neuer Nutzer {user['name']} wird eingefügt")
             cur.execute(
                 "INSERT INTO users VALUES (?,?,?)",
                 (
@@ -246,8 +265,10 @@ def insert_transactions(pending: list):
 
 def insert_transaction(transaction: dict):
     """Insert a transaction into the database"""
+    app.logger.info(
+        f"{transaction['amount']/100} werden auf Nutzer ID {transaction['user']} gebucht"
+    )
     cur = get_db().cursor()
-
     # Insert transaction
     cur.execute(
         "INSERT INTO transactions VALUES (?,?,?,?)",
