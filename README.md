@@ -31,7 +31,17 @@ $ curl http://server:8080/api
 
 Eine einfache Weboberfläche erlaubt für das Administrieren von Nutzerdaten.
 
+## Installation
+
+Die Python-Datei `main.py` ist direkt ausführbar und läuft voreingestellt auf Port 8080.
+
+Eine Unitdatei für Systemd ist unter [kaffee-server.service](/etc/systemd/system/kaffee-server.service) zu finden.
+
+Es wird empfohlen einen HTTP-Server als Proxy zu benutzen (Apache, nginx) um auf Ports 80 und 443 auf den Server umzuleiten.
+
 ## Datenbanken
+
+Im falle dass die Datenbankdatei oder Tabellen fehlen werden diese automatisch beim Erstzugriff aufgestellt.
 
 ### users
 Die Users-Datenbank dient als Speicher für Nutzerdaten wie Name und Transponder Hash.
