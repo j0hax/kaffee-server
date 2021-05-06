@@ -13,6 +13,7 @@ from flask import (
     render_template,
     request,
     send_file,
+    url_for,
 )
 from flask_cors import CORS
 import bcrypt
@@ -103,18 +104,18 @@ def login():
     if user and user.check_password(request.form["password"]):
         flask_login.login_user(user)
         flash("Erfolgreich eingeloggt als " + user.get_id())
-        return redirect("/admin")
+        return redirect(url_for("admin"))
     else:
         app.logger.warning(
             f"Fehlgeschlagener Login-Versuch für Nutzer {username} von {request.host}"
         )
         flash("Falscher Nutzer oder Passwort")
-        return redirect("/login")
+        return redirect(url_for("login"))
 
 
 @login_manager.unauthorized_handler
 def unauthorized_callback():
-    return redirect("/login?next=" + request.path)
+    return redirect(url_for("login", next=request.path))
 
 
 @app.route("/admin")
@@ -149,7 +150,7 @@ def savetable():
         app.logger.info(f"{request.host} löscht Nutzer {user_name} ({user_id})")
         delete_user(user_id)
         flash("Deleted user " + user_name)
-        return redirect("/admin")
+        return redirect(url_for("admin"))
 
     # Assume we are getting one row
     user = [
@@ -180,7 +181,7 @@ def savetable():
             db.commit()
 
     flash("Updated user " + request.form["name"])
-    return redirect("/admin")
+    return redirect(url_for("admin"))
 
 
 @app.route("/api")
