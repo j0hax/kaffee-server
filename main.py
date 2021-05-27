@@ -309,14 +309,14 @@ def get_users() -> dict:
     """Return users with balances as a dict for sending to a client or further processing"""
     cur = get_db().cursor()
     cur.execute(
-        "SELECT * FROM users LEFT JOIN balances ON users.id = balances.id ORDER BY withdrawal_count DESC"
+        "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id ORDER BY withdrawal_count DESC;"
     )
     results = cur.fetchall()
     array = []
     for result in results:
         array.append(
             {
-                "id": result["id"],
+                "id": result["userid"],
                 "name": result["name"],
                 "balance": result["balance"] or 0,
                 "withdrawalCount": result["withdrawal_count"] or 0,
