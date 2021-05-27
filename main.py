@@ -247,7 +247,7 @@ def merge_users(client_users: list):
         else:
             app.logger.info(f"Neuer Nutzer {user['name']} wird eingefügt")
             cur.execute(
-                "INSERT INTO users VALUES (?,?,?)",
+                "INSERT INTO users (name, last_update, transponder_hash) VALUES (?,?,?)",
                 (
                     user["name"],
                     user["lastUpdate"],
