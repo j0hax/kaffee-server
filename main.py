@@ -158,7 +158,7 @@ def savetable():
             "id": user_id,
             "name": user_name,
             "lastUpdate": time.time(),
-            "hash": request.form["transponder_hash"],
+            "transponder": request.form["transponder_code"],
         }
     ]
 
@@ -218,7 +218,7 @@ def verify_key(api_key: str) -> bool:
 
 def delete_user(id: int):
     cur = get_db().cursor()
-    cur.execute("DELETE FROM users WHERE rowid = ?", (id,))
+    cur.execute("DELETE FROM users WHERE id = ?", (id,))
     get_db().commit()
 
 
@@ -227,7 +227,7 @@ def merge_users(client_users: list):
     cur = get_db().cursor()
     for user in client_users:
         # Check if user exists
-        cur.execute("SELECT * FROM users WHERE rowid = ?", (user["id"],))
+        cur.execute("SELECT * FROM users WHERE id = ?", (user["id"],))
         data = cur.fetchone()
 
         if data:
@@ -237,21 +237,21 @@ def merge_users(client_users: list):
                 )
                 # update our user
                 cur.execute(
-                    "UPDATE users SET name=?,transponder_hash=? WHERE rowid=?",
+                    "UPDATE users SET name=?,transponder_code=? WHERE id=?",
                     (
                         user["name"],
-                        user["hash"],
+                        user["transponder"],
                         user["id"],
                     ),
                 )
         else:
             app.logger.info(f"Neuer Nutzer {user['name']} wird eingefügt")
             cur.execute(
-                "INSERT INTO users VALUES (?,?,?)",
+                "INSERT INTO users (name, last_update, transponder_code) VALUES (?,?,?)",
                 (
                     user["name"],
                     user["lastUpdate"],
-                    user["hash"],
+                    user["transponder"],
                 ),
             )
 
@@ -309,14 +309,14 @@ def get_users() -> dict:
     """Return users with balances as a dict for sending to a client or further processing"""
     cur = get_db().cursor()
     cur.execute(
-        "SELECT users.rowid, * FROM users LEFT JOIN balances ON users.rowid = balances.id ORDER BY withdrawal_count DESC"
+        "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id ORDER BY withdrawal_count DESC;"
     )
     results = cur.fetchall()
     array = []
     for result in results:
         array.append(
             {
-                "id": result["rowid"],
+                "id": result["userid"],
                 "name": result["name"],
                 "balance": result["balance"] or 0,
                 "withdrawalCount": result["withdrawal_count"] or 0,
@@ -324,7 +324,7 @@ def get_users() -> dict:
                 "withdrawals": result["withdrawals"] or 0,
                 "deposits": result["deposits"] or 0,
                 "lastUpdate": result["last_update"],
-                "hash": result["transponder_hash"],
+                "transponder": result["transponder_code"],
             }
         )
 
