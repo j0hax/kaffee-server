@@ -198,7 +198,9 @@ def process_transactions():
     data = request.get_json()
 
     # verify API key
-    if not verify_key(request.headers["X-API-KEY"]):
+    if not "X-API-KEY" in request.headers or not verify_key(
+        request.headers["X-API-KEY"]
+    ):
         app.logger.warn(f"{request.host} bucht mit falschem API Key")
         print("Unauthorized request")
         return jsonify("Error: unauthenticated"), 401
