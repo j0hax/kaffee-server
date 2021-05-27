@@ -1,8 +1,9 @@
 -- User database
 CREATE TABLE IF NOT EXISTS users (
-    name varchar(255) NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL,
     last_update FLOAT DEFAULT (strftime('%s','now')),
-    transponder_hash varchar(255)
+    transponder_hash VARCHAR(255)
 );
 
 CREATE TRIGGER IF NOT EXISTS update_last_update
