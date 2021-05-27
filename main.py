@@ -158,7 +158,7 @@ def savetable():
             "id": user_id,
             "name": user_name,
             "lastUpdate": time.time(),
-            "hash": request.form["transponder_hash"],
+            "transponder": request.form["transponder_code"],
         }
     ]
 
@@ -237,21 +237,21 @@ def merge_users(client_users: list):
                 )
                 # update our user
                 cur.execute(
-                    "UPDATE users SET name=?,transponder_hash=? WHERE id=?",
+                    "UPDATE users SET name=?,transponder_code=? WHERE id=?",
                     (
                         user["name"],
-                        user["hash"],
+                        user["transponder"],
                         user["id"],
                     ),
                 )
         else:
             app.logger.info(f"Neuer Nutzer {user['name']} wird eingefügt")
             cur.execute(
-                "INSERT INTO users (name, last_update, transponder_hash) VALUES (?,?,?)",
+                "INSERT INTO users (name, last_update, transponder_code) VALUES (?,?,?)",
                 (
                     user["name"],
                     user["lastUpdate"],
-                    user["hash"],
+                    user["transponder"],
                 ),
             )
 
@@ -324,7 +324,7 @@ def get_users() -> dict:
                 "withdrawals": result["withdrawals"] or 0,
                 "deposits": result["deposits"] or 0,
                 "lastUpdate": result["last_update"],
-                "hash": result["transponder_hash"],
+                "transponder": result["transponder_code"],
             }
         )
 
