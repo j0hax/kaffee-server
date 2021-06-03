@@ -56,6 +56,7 @@
     </tbody>
 </table>
 <h2>Kassenaktivität</h2>
+<h3>Letzten {{transactions | length}} Transaktionen</h3>
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead>
         <tr>
@@ -68,7 +69,7 @@
     <tbody>
         {% for t in transactions %}
         <tr>
-            <td>{{ t.user }}</td>
+            <td>{{ t.name }}</td>
             <td>{{ t.amount | pretty_currency }}</td>
             <td>{{ t.description }}</td>
             <td>{{ t.timestamp | pretty_date }}</td>
@@ -76,6 +77,10 @@
         {% endfor %}
     </tbody>
 </table>
+<h3>Neue Kassen Ein/Auszahlung</h3>
+
+
+
 <h2>Backup-Dateien</h2>
 <a href="/admin/dump/users" class="pure-button pure-button-primary" style="margin: 0 auto">
     <ion-icon name="download"></ion-icon> Nutzerdaten Backup

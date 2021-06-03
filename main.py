@@ -356,7 +356,10 @@ def get_users() -> dict:
 def get_transactions(limit=10) -> dict:
     """Return a list of transactions"""
     cur = get_db().cursor()
-    cur.execute("SELECT * FROM transactions ORDER BY timestamp ASC LIMIT ?;", (limit,))
+    cur.execute(
+        "SELECT name, amount, description, timestamp FROM transactions LEFT JOIN users ON transactions.user = users.id ORDER BY timestamp DESC LIMIT ?;",
+        (limit,),
+    )
     return cur.fetchall()
 
 
