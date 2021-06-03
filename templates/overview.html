@@ -5,7 +5,7 @@
 <h1>Statistiken</h1>
 <h2>Nutzer: {{ users | length }}</h2>
 <h2>Kaffees Getrunken: {{ users | sum(attribute='withdrawalCount') | pretty_number }}</h2>
-<h2>Kasse: {{ users | sum(attribute='balance') | pretty_currency }} ({{ users | sum(attribute='depositCount') |
+<h2>Kasse: {{ transactions | sum(attribute='amount') | pretty_currency }} ({{ users | sum(attribute='depositCount') |
     pretty_number }} Einzahlungen)</h2>
 
 <h1>Nutzerübersicht</h1>

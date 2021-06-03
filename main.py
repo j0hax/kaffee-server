@@ -73,7 +73,9 @@ def close_connection(exception):
 
 @app.route("/")
 def index():
-    return render_template("overview.html", users=get_users())
+    return render_template(
+        "overview.html", users=get_users(), transactions=get_transactions()
+    )
 
 
 @login_manager.user_loader
@@ -141,6 +143,23 @@ def save_admin_password():
             (hashed.decode(), username),
         )
         flash("Passwort geändert.")
+
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/save/transaction", methods=["POST"])
+@flask_login.login_required
+def save_admin_transaction():
+
+    print(request.form)
+    data = {
+        "user": 0,
+        "amount": -(int(request.form["amount"]) * 100),
+        "description": f"[ADMIN/{request.form['user']}] {request.form['description']}",
+        "timestamp": time.time(),
+    }
+    print(data)
+    insert_transaction(data)
 
     return redirect(url_for("admin"))
 
@@ -287,6 +306,7 @@ def insert_transactions(pending: list):
 
 
 def insert_transaction(transaction: dict):
+    print(transaction)
     """Insert a transaction into the database"""
     app.logger.info(
         f"{transaction['amount']/100} werden auf Nutzer ID {transaction['user']} gebucht"

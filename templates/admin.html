@@ -77,9 +77,30 @@
         {% endfor %}
     </tbody>
 </table>
-<h3>Neue Kassen Ein/Auszahlung</h3>
-
-
+<h3>Neue Kassenauszahlung</h3>
+<form class="pure-form pure-form-aligned" style="max-width: 768px; margin:1em auto" action="/admin/save/transaction"
+    method="post">
+    <fieldset>
+        <div class="pure-control-group">
+            <label for="aligned-name">Name</label>
+            <input type="text" id="aligned-name" name="user" value="Administrator" required />
+        </div>
+        <div class="pure-control-group">
+            <label for="amount">Betrag</label>
+            <input id="amount" type="number" name="amount" value="0" step="0.01" required />
+            <span class="pure-form-message-inline">Bei <b>Einzahlungen</b> einen negativen Betrag eingeben.</span>
+        </div>
+        <div class="pure-control-group">
+            <label for="description">Verwendungszweck</label>
+            <input type="text" id="description" name="description" placeholder="Bohnen gekauft..." required />
+        </div>
+        <div class="pure-controls">
+            <button type="submit" class="pure-button pure-button-primary">
+                Speichern <ion-icon name="arrow-forward"></ion-icon>
+            </button>
+        </div>
+    </fieldset>
+</form>
 
 <h2>Backup-Dateien</h2>
 <a href="/admin/dump/users" class="pure-button pure-button-primary" style="margin: 0 auto">
