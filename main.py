@@ -122,7 +122,9 @@ def unauthorized_callback():
 @flask_login.login_required
 def admin():
     app.logger.info(f"{request.host} hat den Adminbereich betreten")
-    return render_template("admin.html", users=get_users())
+    return render_template(
+        "admin.html", users=get_users(), transactions=get_transactions()
+    )
 
 
 @app.route("/admin/save/password", methods=["POST"])
@@ -349,6 +351,13 @@ def get_users() -> dict:
         )
 
     return array
+
+
+def get_transactions(limit=10) -> dict:
+    """Return a list of transactions"""
+    cur = get_db().cursor()
+    cur.execute("SELECT * FROM transactions ORDER BY timestamp ASC LIMIT ?;", (limit,))
+    return cur.fetchall()
 
 
 if __name__ == "__main__":

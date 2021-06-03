@@ -1,6 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Übersicht{% endblock %}
+{% block title %}Adminbereich{% endblock %}
 {% block content %}
+<h1>Adminbereich</h1>
+<h2>Nutzer Übersicht</h2>
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead>
         <tr>
@@ -53,10 +55,32 @@
         </form>
     </tbody>
 </table>
-<br>
+<h2>Kassenaktivität</h2>
+<table class="pure-table pure-table-horizontal" style="width: 100%">
+    <thead>
+        <tr>
+            <th>Nutzer</th>
+            <th>Betrag</th>
+            <th>Verwendungszweck</th>
+            <th>Zeitstempel</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.user }}</td>
+            <td>{{ t.amount | pretty_currency }}</td>
+            <td>{{ t.description }}</td>
+            <td>{{ t.timestamp | pretty_date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h2>Backup-Dateien</h2>
 <a href="/admin/dump/users" class="pure-button pure-button-primary" style="margin: 0 auto">
     <ion-icon name="download"></ion-icon> Nutzerdaten Backup
 </a>
+<h2>Admin-Konto</h2>
 <form class="pure-form" action="/admin/save/password" method="post">
     <fieldset>
         <legend>Administrator Passwort ändern</legend>
