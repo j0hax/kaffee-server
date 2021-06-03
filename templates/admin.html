@@ -57,5 +57,13 @@
 <a href="/admin/dump/users" class="pure-button pure-button-primary" style="margin: 0 auto">
     <ion-icon name="download"></ion-icon> Nutzerdaten Backup
 </a>
-
+<form class="pure-form" action="/admin/save/password" method="post">
+    <fieldset>
+        <legend>Administrator Passwort ändern</legend>
+        <input type="password" placeholder="Passwort" name="password" />
+        <button type="submit" class="pure-button pure-button-primary">
+            <ion-icon name="key"></ion-icon>
+        </button>
+    </fieldset>
+</form>
 {% endblock %}

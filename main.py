@@ -125,6 +125,24 @@ def admin():
     return render_template("admin.html", users=get_users())
 
 
+@app.route("/admin/save/password", methods=["POST"])
+@flask_login.login_required
+def save_admin_password():
+    password = request.form["password"]
+    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+    username = flask_login.current_user.get_id()
+
+    with get_db() as con:
+        con.cursor().execute(
+            "UPDATE admins SET pw_hash = ? WHERE username = ?",
+            (hashed.decode(), username),
+        )
+        flash("Passwort geändert.")
+
+    return redirect(url_for("admin"))
+
+
 @app.route("/admin/dump/users")
 def dump_users():
     """Downloads a CSV of user data"""
