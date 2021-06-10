@@ -1,6 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Übersicht{% endblock %}
+{% block title %}Adminbereich{% endblock %}
 {% block content %}
+<h1>Adminbereich</h1>
+<h2>Nutzer Übersicht</h2>
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead>
         <tr>
@@ -53,9 +55,65 @@
         </form>
     </tbody>
 </table>
-<br>
+<h2>Kassenaktivität</h2>
+<h3>Letzten {{transactions | length}} Transaktionen</h3>
+<table class="pure-table pure-table-horizontal" style="width: 100%">
+    <thead>
+        <tr>
+            <th>Nutzer</th>
+            <th>Betrag</th>
+            <th>Verwendungszweck</th>
+            <th>Zeitstempel</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.name }}</td>
+            <td>{{ t.amount | pretty_currency }}</td>
+            <td>{{ t.description }}</td>
+            <td>{{ t.timestamp | pretty_date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h3>Neue Kassenauszahlung</h3>
+<form class="pure-form pure-form-aligned" style="max-width: 768px; margin:1em auto" action="/admin/save/transaction"
+    method="post">
+    <fieldset>
+        <div class="pure-control-group">
+            <label for="aligned-name">Name</label>
+            <input type="text" id="aligned-name" name="user" value="Administrator" required />
+        </div>
+        <div class="pure-control-group">
+            <label for="amount">Betrag</label>
+            <input id="amount" type="number" name="amount" value="0" step="0.01" required />
+            <span class="pure-form-message-inline">Bei <b>Einzahlungen</b> einen negativen Betrag eingeben.</span>
+        </div>
+        <div class="pure-control-group">
+            <label for="description">Verwendungszweck</label>
+            <input type="text" id="description" name="description" placeholder="Bohnen gekauft..." required />
+        </div>
+        <div class="pure-controls">
+            <button type="submit" class="pure-button pure-button-primary">
+                Speichern <ion-icon name="arrow-forward"></ion-icon>
+            </button>
+        </div>
+    </fieldset>
+</form>
+
+<h2>Backup-Dateien</h2>
 <a href="/admin/dump/users" class="pure-button pure-button-primary" style="margin: 0 auto">
     <ion-icon name="download"></ion-icon> Nutzerdaten Backup
 </a>
-
+<h2>Admin-Konto</h2>
+<form class="pure-form" action="/admin/save/password" method="post">
+    <fieldset>
+        <legend>Administrator Passwort ändern</legend>
+        <input type="password" placeholder="Passwort" name="password" />
+        <button type="submit" class="pure-button pure-button-primary">
+            <ion-icon name="key"></ion-icon>
+        </button>
+    </fieldset>
+</form>
 {% endblock %}

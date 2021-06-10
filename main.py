@@ -73,7 +73,9 @@ def close_connection(exception):
 
 @app.route("/")
 def index():
-    return render_template("overview.html", users=get_users())
+    return render_template(
+        "overview.html", users=get_users(), transactions=get_transactions()
+    )
 
 
 @login_manager.user_loader
@@ -122,7 +124,44 @@ def unauthorized_callback():
 @flask_login.login_required
 def admin():
     app.logger.info(f"{request.host} hat den Adminbereich betreten")
-    return render_template("admin.html", users=get_users())
+    return render_template(
+        "admin.html", users=get_users(), transactions=get_transactions()
+    )
+
+
+@app.route("/admin/save/password", methods=["POST"])
+@flask_login.login_required
+def save_admin_password():
+    password = request.form["password"]
+    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+    username = flask_login.current_user.get_id()
+
+    with get_db() as con:
+        con.cursor().execute(
+            "UPDATE admins SET pw_hash = ? WHERE username = ?",
+            (hashed.decode(), username),
+        )
+        flash("Passwort geändert.")
+
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/save/transaction", methods=["POST"])
+@flask_login.login_required
+def save_admin_transaction():
+
+    print(request.form)
+    data = {
+        "user": 0,
+        "amount": -(int(request.form["amount"]) * 100),
+        "description": f"[ADMIN/{request.form['user']}] {request.form['description']}",
+        "timestamp": time.time(),
+    }
+    print(data)
+    insert_transaction(data)
+
+    return redirect(url_for("admin"))
 
 
 @app.route("/admin/dump/users")
@@ -267,6 +306,7 @@ def insert_transactions(pending: list):
 
 
 def insert_transaction(transaction: dict):
+    print(transaction)
     """Insert a transaction into the database"""
     app.logger.info(
         f"{transaction['amount']/100} werden auf Nutzer ID {transaction['user']} gebucht"
@@ -331,6 +371,16 @@ def get_users() -> dict:
         )
 
     return array
+
+
+def get_transactions(limit=10) -> dict:
+    """Return a list of transactions"""
+    cur = get_db().cursor()
+    cur.execute(
+        "SELECT name, amount, description, timestamp FROM transactions LEFT JOIN users ON transactions.user = users.id ORDER BY timestamp DESC LIMIT ?;",
+        (limit,),
+    )
+    return cur.fetchall()
 
 
 if __name__ == "__main__":
