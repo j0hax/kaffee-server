@@ -18,12 +18,18 @@ from datetime import datetime
 
 from kaffee_server.users import get_users, get_transactions
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 locale.setlocale(locale.LC_ALL, "de_DE")
 
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    
+    # App is behind one proxy that sets the -For and -Host headers.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+    
     CORS(app)
     app.config.from_mapping(
         SECRET_KEY="dev",
