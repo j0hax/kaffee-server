@@ -75,20 +75,24 @@ def create_app(test_config=None):
     # Add our custom filters
     @app.template_filter("from_cents")
     def from_cents(cents: int) -> float:
+        """ Formats an amount of cents into full currency """
         if not cents:
             return 0
         return cents / 100
 
     @app.template_filter("pretty_currency")
     def pretty_currency(cents: int) -> str:
+        """ Formats an amount of cents as a localized String """
         return locale.currency(from_cents(cents))
 
     @app.template_filter("pretty_date")
     def pretty_date(timestamp: float) -> str:
+        """ Formats a UNIX Timestamp as a localized string """
         return datetime.fromtimestamp(timestamp).strftime("%a, %x um %X")
 
     @app.template_filter("pretty_number")
     def pretty_number(number: float) -> str:
+        """ Formats a number with localized seperators """
         return locale.format_string("%d", number, grouping=True)
 
     return app
