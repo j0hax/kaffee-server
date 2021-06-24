@@ -103,9 +103,20 @@
 </form>
 
 <h2>Backup-Dateien</h2>
-<a href="/admin/dump/users" class="pure-button pure-button-primary" style="margin: 0 auto">
+<a href="/admin/dump/users" class="pure-button pure-button" style="margin: 0 auto">
     <ion-icon name="download"></ion-icon> Nutzerdaten Backup
 </a>
+<a href="/admin/dump/database" class="pure-button pure-button-primary" style="margin: 0 auto">
+    <ion-icon name="download"></ion-icon> Vollständiges Datenbank Backup
+</a>
+
+<h3>Datenbank-Backup Hochladen</h3>
+
+<form method="post" enctype="multipart/form-data" action="/admin/dump/restore">
+    <input type="file" name="file">
+    <input type="submit" class="pure-button pure-button-primary" value="Hochladen">
+</form>
+
 <h2>Admin-Konto</h2>
 <form class="pure-form" action="/admin/save/password" method="post">
     <fieldset>

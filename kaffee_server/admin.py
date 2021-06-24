@@ -15,11 +15,12 @@ from flask import (
     request,
     session,
     url_for,
-    send_file
+    send_file,
+    current_app,
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from kaffee_server.db import get_db
+from kaffee_server.db import get_db, close_db
 from kaffee_server.users import (
     get_users,
     merge_users,
@@ -31,6 +32,8 @@ from kaffee_server.users import (
 import time
 import csv
 import tempfile
+import gzip
+import os
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -80,7 +83,6 @@ def save_transaction():
         "description": f"[ADMIN/{request.form['user']}] {request.form['description']}",
         "timestamp": time.time(),
     }
-    print(data)
     insert_transaction(data)
 
     return redirect(url_for(".index"))
@@ -139,6 +141,50 @@ def dump_users():
     outfile.flush()
 
     return send_file(outfile.name, as_attachment=True, attachment_filename="users.csv")
+
+
+@bp.route("/dump/database")
+def dump_db():
+    """Downloads a compressed dump of the database"""
+    db = get_db()
+    with gzip.open(tempfile.NamedTemporaryFile().name, "wb") as f:
+        for line in db.iterdump():
+            f.write(f"{line}\n".encode())
+
+        f.flush()
+
+        return send_file(
+            f.name, as_attachment=True, attachment_filename="database.sql.gz"
+        )
+
+
+@bp.route("/dump/restore", methods=["GET", "POST"])
+def restore_db():
+    """Restores a compressed dump of the database"""
+    if request.method == "POST":
+        # check if the post request has the file part
+        if "file" not in request.files:
+            flash("Keine Datei!")
+            return redirect(request.url)
+
+        # Rename the old Database
+        close_db()
+        db_name = current_app.config["DATABASE"]
+        os.rename(db_name, db_name + ".old")
+
+        # Read the file into the database
+        file = request.files["file"]
+
+        data = gzip.decompress(file.read()).decode()
+
+        with get_db() as con:
+            # BUG: https://github.com/python/cpython/pull/9621#issuecomment-867623231
+            con.execute("CREATE TABLE sqlite_sequence(name varchar(255), seq int);")
+            con.executescript(data)
+
+        flash("Daten erfolgreich wiederhergestellt")
+        return redirect("/")
+
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
