@@ -8,6 +8,7 @@ from flask import (
     Blueprint,
     request,
     jsonify,
+    current_app,
 )
 
 from kaffee_server.users import get_users, insert_transactions
@@ -18,7 +19,10 @@ bp = Blueprint("api", __name__, url_prefix="/api")
 
 def generate_data() -> dict:
     """Creates a dict with user data and statistics, to be sent to the client"""
-    return {"users": get_users()}
+    return {
+        "users": get_users(),
+        "statistics": {"drinkPrice": current_app.config["DRINK_PRICE"]},
+    }
 
 
 def verify_key(api_key: str) -> bool:
