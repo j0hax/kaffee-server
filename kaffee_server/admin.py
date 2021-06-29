@@ -165,7 +165,7 @@ def restore_db():
         # check if the post request has the file part
         if "file" not in request.files:
             flash("Keine Datei!")
-            return redirect(request.url)
+            return redirect(url_for(request.url))
 
         # Rename the old Database
         close_db()
