@@ -25,6 +25,8 @@ def generate_data(start=time()) -> dict:
     return {
         "users": users,
         "statistics": {
+            "motd": current_app.config["MOTD"],
+            "beanInfo": current_app.config["BEANINFO"],
             "drinkPrice": current_app.config["DRINK_PRICE"],
             "queryTime": time() - start,
         },
