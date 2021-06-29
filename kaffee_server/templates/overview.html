@@ -4,8 +4,8 @@
 
 <h1>Statistiken</h1>
 <h2>Nutzer: {{ users | length }}</h2>
-<h2>Kaffees Getrunken: {{ users | sum(attribute='withdrawalCount') | pretty_number }}</h2>
-<h2>Kasse: {{ transactions | sum(attribute='amount') | pretty_currency }} ({{ users | sum(attribute='depositCount') |
+<h2>Kaffees Getrunken: {{ users | sum(attribute='withdrawals') | pretty_number }}</h2>
+<h2>Kasse: {{ transactions | sum(attribute='amount') | pretty_currency }} ({{ users | sum(attribute='deposits') |
     pretty_number }} Einzahlungen)</h2>
 
 <h1>Nutzerübersicht</h1>
@@ -22,7 +22,7 @@
         {% for user in users %}
         <tr>
             <td>{{ user.name }}</td>
-            <td>{{ user.withdrawalCount | pretty_number }}</td>
+            <td>{{ user.withdrawals | pretty_number }}</td>
             <td>{{ user.balance | pretty_currency }}</td>
             <td>{{ user.lastUpdate | pretty_date }}</td>
         </tr>
