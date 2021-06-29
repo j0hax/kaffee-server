@@ -16,6 +16,11 @@ from kaffee_server.db import get_db
 bp = Blueprint("api", __name__, url_prefix="/api")
 
 
+def generate_data() -> dict:
+    """Creates a dict with user data and statistics, to be sent to the client"""
+    return {"users": get_users()}
+
+
 def verify_key(api_key: str) -> bool:
     """Verifies an API key in the database"""
     cur = get_db().cursor()
@@ -28,7 +33,7 @@ def verify_key(api_key: str) -> bool:
 @bp.route("/")
 def api():
     """Return a list of users"""
-    return jsonify(get_users())
+    return jsonify(generate_data())
 
 
 @bp.route("transactions", methods=["POST"])
@@ -45,4 +50,5 @@ def process_transactions():
         return jsonify("Error: unauthenticated"), 401
 
     insert_transactions(data)
-    return jsonify(get_users())
+
+    return jsonify(generate_data())
