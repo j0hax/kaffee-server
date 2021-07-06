@@ -35,7 +35,7 @@ def create_app(test_config=None):
         SECRET_KEY="dev",
         DATABASE=os.path.join(app.instance_path, "kaffee.sqlite"),
         DRINK_PRICE=40,
-        MOTD="Wilkommen!",
+        MOTD="Willkommen!",
         BEANINFO={"brand": "Tchibo", "type": "Espresso, Mailänder Art"},
     )
 
