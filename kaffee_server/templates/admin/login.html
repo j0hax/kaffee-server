@@ -1,16 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
-<div style="max-width: 256px; margin:1em auto">
-    <form class="pure-form pure-form-stacked" method="post">
-        <fieldset>
-            <legend>Bitte einloggen</legend>
-            <input type="text" name="username" placeholder="Nutzername" class="pure-input-1" required />
-            <input type="password" name="password" placeholder="Passwort" class="pure-input-1" required />
-            <!--<label for="stacked-remember" class="pure-checkbox">
-                <input type="checkbox" id="stacked-remember" /> Eingeloggt bleiben</label>-->
-            <button type="submit" class="pure-button pure-button-primary">Einloggen</button>
-        </fieldset>
+<div class="uk-container uk-container-xsmall">
+    <form method="post">
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-expand">
+                <span class="uk-form-icon" uk-icon="icon: user"></span>
+                <input type="text" name="username" placeholder="Nutzername" class="uk-input uk-width-expand" required />
+            </div>
+        </div>
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-expand">
+                <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                <input type="password" name="password" placeholder="Passwort" class="uk-input uk-width-expand"
+                    required />
+            </div>
+        </div>
+        <div class="uk-margin">
+            <button type="submit" class="uk-button uk-button-primary">Einloggen</button>
+        </div>
     </form>
 </div>
 {% endblock %}

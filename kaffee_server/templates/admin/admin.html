@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Adminbereich{% endblock %}
 {% block content %}
-<h1>Adminbereich</h1>
-<h2>Nutzer Übersicht</h2>
-<table class="pure-table pure-table-horizontal" style="width: 100%">
+<h2 class="uk-heading-line"><span>Nutzerdaten</span></h2>
+<table class="uk-table uk-table-hover">
+    <caption>Zum Bearbeiten eines Feldes klicken</caption>
     <thead>
         <tr>
             <th>ID</th>
@@ -19,45 +19,54 @@
         {% for user in users | sort(attribute='name') %}
         <form action="/admin/save/user" method="post">
             <tr>
-                <td><input type="text" name="id" value="{{ user.id }}" readonly></td>
-                <td><input type="text" name="name" value="{{ user.name }}" required></td>
-                <td><input type="text" name="transponder_code" value="{{ user.transponder }}"></td>
-                <td><input type="number" name="payment" value="0" step="0.01" required></td>
+                <td><input type="text" name="id" value="{{ user.id }}" class="uk-input uk-form-blank uk-width-expand"
+                        readonly></td>
+                <td><input type="text" name="name" value="{{ user.name }}"
+                        class="uk-input uk-form-blank uk-width-expand" required></td>
+                <td><input type="text" name="transponder_code" value="{{ user.transponder }}"
+                        class="uk-input uk-form-blank uk-width-expand"></td>
+                <td><input type="number" name="payment" value="0" step="0.01"
+                        class="uk-input uk-form-blank uk-width-expand" required>
+                </td>
                 <td>{{ user.balance | pretty_currency }}</td>
                 <td>
-                    <div class="pure-button-group" role="group">
-                        <button type="submit" class="pure-button pure-button-primary" name="action" value="save">
-                            <ion-icon name="save"></ion-icon>
+                    <div class="uk-button-group uk-width-expand">
+                        <button type="submit" name="action" value="save"
+                            class="uk-button uk-button-primary uk-width-expand">
+                            <span uk-icon="check"></span>
                         </button>
-                        <button type="submit" class="pure-button pure-button-danger" name="action" value="delete"
-                            onclick="return confirm('Nutzer permanent löschen?')">
-                            <ion-icon name="trash"></ion-icon>
+                        <button type="submit" name="action" value="delete"
+                            onclick="return confirm('Nutzer permanent löschen?')"
+                            class="uk-button uk-button-danger uk-width-expand">
+                            <span uk-icon="trash"></span>
                         </button>
                     </div>
-                </td>
                 </td>
             </tr>
         </form>
         {% endfor %}
         <form action="/admin/save/user" method="post">
             <tr>
-                <td><input type="text" name="id" value="-" readonly></td>
-                <td><input type="text" name="name" placeholder="Neuer Benutzer" required></td>
-                <td><input type="text" name="transponder_code"></td>
-                <td>N/A</td>
-                <td>N/A</td>
+                <td><input type="text" name="id" value="-" class="uk-input uk-form-blank uk-width-expand" readonly></td>
+                <td><input type="text" name="name" placeholder="Neuer Benutzer"
+                        class="uk-input uk-form-blank uk-width-expand" required></td>
+                <td><input type="text" name="transponder_code" placeholder="Transpondercode"
+                        class="uk-input uk-form-blank uk-width-expand"></td>
+                <td><input type="text" placeholder="-" class="uk-input uk-form-blank uk-width-expand" readonly></td>
+                <td><input type="text" placeholder="-" class="uk-input uk-form-blank uk-width-expand" readonly></td>
                 <td>
-                    <button type="submit" class="pure-button pure-button-primary" name="action" value="save">
-                        <ion-icon name="person-add"></ion-icon>
+                    <button type="submit" name="action" value="save"
+                        class="uk-button uk-button-primary uk-width-expand">
+                        <span uk-icon="plus"></span>
                     </button>
                 </td>
             </tr>
         </form>
     </tbody>
 </table>
-<h2>Kassenaktivität</h2>
+<h2 class="uk-heading-line"><span>Kassenaktivität</span></h2>
 <h3>Letzten {{transactions | length}} Transaktionen</h3>
-<table class="pure-table pure-table-horizontal" style="width: 100%">
+<table class="uk-table uk-table-hover">
     <thead>
         <tr>
             <th>Nutzer</th>
@@ -78,53 +87,50 @@
     </tbody>
 </table>
 <h3>Neue Kassenauszahlung</h3>
-<form class="pure-form pure-form-aligned" style="max-width: 768px; margin:1em auto" action="/admin/save/transaction"
-    method="post">
-    <fieldset>
-        <div class="pure-control-group">
-            <label for="aligned-name">Name</label>
-            <input type="text" id="aligned-name" name="user" value="Administrator" required />
+<p class="uk-text-meta">Für eine arbiträre Einzahlung, einen negativen Betrag eingeben.</p>
+<form class="uk-form-horizontal uk-margin" action="/admin/save/transaction" method="post">
+    <div class="uk-margin">
+        <label class="uk-form-label" for="form-name">Name</label>
+        <div class="uk-form-controls">
+            <input class="uk-input" id="form-name" type="text" name="user" value="Administrator" required>
         </div>
-        <div class="pure-control-group">
-            <label for="amount">Betrag</label>
-            <input id="amount" type="number" name="amount" value="0" step="0.01" required />
-            <span class="pure-form-message-inline">Bei <b>Einzahlungen</b> einen negativen Betrag eingeben.</span>
+    </div>
+    <div class="uk-margin">
+        <label class="uk-form-label" for="form-amount">Betrag</label>
+        <div class="uk-form-controls">
+            <input class="uk-input" id="form-amount" type="number" name="amount" value="0" step="0.01" required>
         </div>
-        <div class="pure-control-group">
-            <label for="description">Verwendungszweck</label>
-            <input type="text" id="description" name="description" placeholder="Bohnen gekauft..." required />
+    </div>
+    <div class="uk-margin">
+        <label class="uk-form-label" for="form-description">Verwendungszweck</label>
+        <div class="uk-form-controls">
+            <input class="uk-input" id="form-description" type="text" name="description" placeholder="Bohnen gekauft?"
+                required>
         </div>
-        <div class="pure-controls">
-            <button type="submit" class="pure-button pure-button-primary">
-                Speichern <ion-icon name="arrow-forward"></ion-icon>
-            </button>
-        </div>
-    </fieldset>
+    </div>
+
+    <button type="submit" class="uk-button uk-button-primary uk-margin"><span class="uk-margin-small-right"
+            uk-icon="check"></span>Speichern</button>
 </form>
 
-<h2>Backup-Dateien</h2>
-<a href="/admin/dump/users" class="pure-button pure-button" style="margin: 0 auto">
-    <ion-icon name="download"></ion-icon> Nutzerdaten Backup
+<h2 class="uk-heading-line"><span>Backups</span></h2>
+<a href="/admin/dump/users" class="uk-button uk-button-default">
+    <span uk-icon="users"></span> Nutzerdaten Backup
 </a>
-<a href="/admin/dump/database" class="pure-button pure-button-primary" style="margin: 0 auto">
-    <ion-icon name="download"></ion-icon> Vollständiges Datenbank Backup
+<a href="/admin/dump/database" class="uk-button uk-button-primary">
+    <span uk-icon="database"></span> Vollständiges Datenbank Backup
 </a>
 
 <h3>Datenbank-Backup Hochladen</h3>
 
 <form method="post" enctype="multipart/form-data" action="/admin/dump/restore">
     <input type="file" name="file">
-    <input type="submit" class="pure-button pure-button-primary" value="Hochladen">
+    <button class="uk-button uk-button-primary" type="submit" tabindex="-1">Hochladen</button>
 </form>
 
-<h2>Admin-Konto</h2>
-<form class="pure-form" action="/admin/save/password" method="post">
-    <fieldset>
-        <legend>Administrator Passwort ändern</legend>
-        <input type="password" placeholder="Passwort" name="password" />
-        <button type="submit" class="pure-button pure-button-primary">
-            <ion-icon name="key"></ion-icon>
-        </button>
-    </fieldset>
+<h2 class="uk-heading-line"><span>Admin-Konto</span></h2>
+<form action="/admin/save/password" method="post">
+    <input type="password" placeholder="Passwort" class="uk-input uk-width-auto" name="password" /><button type="submit"
+        class="pure-button pure-button-primary uk-width-auto">Ändern</button>
 </form>
 {% endblock %}
