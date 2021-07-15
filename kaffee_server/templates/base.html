@@ -5,79 +5,50 @@
     {% block head %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/pure-min.css">
+
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.7.0/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.0/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.0/dist/js/uikit-icons.min.js"></script>
+
     <title>Kaffeesystem: {% block title %}{% endblock %}</title>
-    <style>
-        /* Make our forms look like they are regular text */
-        input[readonly] {
-            background-color: transparent;
-            border: 0;
-            font-size: 1em;
-        }
-
-        .money::after {
-            content: "€";
-        }
-
-        .flashes {
-            background-color: lightblue;
-            border: 1px solid darkblue;
-            margin: 1em;
-            padding: 1em 2em;
-            border-radius: 5px;
-        }
-
-        .pure-button-danger {
-            transition: all 0.1s;
-        }
-
-        .pure-button-danger:hover {
-            color: white;
-            background-color: red;
-        }
-
-        h1,
-        h2,
-        h3 {
-            text-align: center;
-        }
-    </style>
     {% endblock %}
 </head>
 
-<body style="background: white">
-    <div class="pure-menu pure-menu-horizontal" style="background: #333; margin-bottom: 1em">
-        <a href="/" class="pure-menu-heading pure-menu-link">Kaffee Server</a>
-        <ul class="pure-menu-list">
-            <li class="pure-menu-item">
-                <a href="/" class="pure-menu-link">Übersicht</a>
-            </li>
-            <li class="pure-menu-item">
-                <a href="/admin" class="pure-menu-link">Adminbereich</a>
-            </li>
-            <li class="pure-menu-item">
-                <a href="/api" class="pure-menu-link">Rohdaten</a>
-            </li>
-        </ul>
-    </div>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class=flashes>
+<body>
+    <nav class="uk-navbar-container uk-margin-bottom" uk-navbar>
+        <div class="uk-navbar-left">
+            <a href="/" class="uk-navbar-item uk-logo">Kaffee-Server</a>
+            <ul class="uk-navbar-nav">
+                <li><a href="/">Übersicht</a></li>
+                <li><a href="/admin">Adminbereich</a></li>
+                <li><a href="/api">Rohdaten</a></li>
+            </ul>
+
+        </div>
+    </nav>
+    <div class="uk-container uk-container-xlarge">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
         {% for message in messages %}
-        <li>
-            {{ message }}
-        </li>
+        <div class="uk-alert-primary" uk-alert>
+            <a class="uk-alert-close" uk-close></a>
+            <p>{{ message }}</p>
+        </div>
         {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    <div id="content" style="margin: 1em">{% block content %}{% endblock %}</div>
-    <footer>
+        {% endif %}
+        {% endwith %}
+        <h1 class="uk-text-center">{{ self.title() }}</h1>
+        {% block content %}
+        {% endblock %}
+    </div>
+    <footer class="uk-container uk-margin-top">
         {% block footer %}
-        <hr>
         <small>Nur für den internen gebrauch</small>
         {% endblock %}
     </footer>
-    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
 </body>
 
 </html>

@@ -2,14 +2,14 @@
 {% block title %}Übersicht{% endblock %}
 {% block content %}
 
-<h1>Statistiken</h1>
-<h2>Nutzer: {{ users | length }}</h2>
-<h2>Kaffees Getrunken: {{ users | sum(attribute='withdrawals') | pretty_number }}</h2>
-<h2>Kasse: {{ transactions | sum(attribute='amount') | pretty_currency }} ({{ users | sum(attribute='deposits') |
-    pretty_number }} Einzahlungen)</h2>
+<h2 class="uk-heading-line"><span>Statistiken</span></h2>
+<h3>Nutzer: {{ users | length }}</h3>
+<h3>Kaffees Getrunken: {{ users | sum(attribute='withdrawals') | pretty_number }}</h3>
+<h3>Kasse: {{ transactions | sum(attribute='amount') | pretty_currency }} ({{ users | sum(attribute='deposits') |
+    pretty_number }} Einzahlungen)</h3>
 
-<h1>Nutzerübersicht</h1>
-<table class="pure-table pure-table-striped" style="width: 100%">
+<h2 class="uk-heading-line"><span>Nutzerübersicht</span></h2>
+<table class="uk-table uk-table-hover">
     <thead>
         <tr>
             <th>Name</th>
