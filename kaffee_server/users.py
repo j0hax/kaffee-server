@@ -17,7 +17,7 @@ def delete_user(id: int):
     get_db().commit()
 
 
-def get_users() -> dict:
+def get_users(sensitive=True) -> dict:
     """Return a list of users
 
     These can be directly converted to JSON for the client or used for further processing.
@@ -29,19 +29,22 @@ def get_users() -> dict:
     results = cur.fetchall()
     array = []
     for result in results:
-        array.append(
-            {
-                "id": result["userid"],
-                "name": result["name"],
-                "balance": result["balance"] or 0,
-                "withdrawals": result["withdrawal_count"] or 0,
-                "deposits": result["deposit_count"] or 0,
-                "withdrawalTotal": result["withdrawals"] or 0,
-                "depositTotal": result["deposits"] or 0,
-                "lastUpdate": result["last_update"],
-                "transponder": result["transponder_code"],
-            }
-        )
+        user_data = {
+            "id": result["userid"],
+            "name": result["name"],
+            "balance": result["balance"] or 0,
+            "lastUpdate": result["last_update"],
+        }
+
+        # Include sensitive data if requested
+        if sensitive:
+            user_data["transponder"] = result["transponder_code"]
+            user_data["withdrawals"] = result["withdrawal_count"] or 0
+            user_data["deposits"] = result["deposit_count"] or 0
+            user_data["withdrawalTotal"] = result["withdrawals"] or 0
+            user_data["depositTotal"] = result["deposits"] or 0
+
+        array.append(user_data)
 
     return array
 

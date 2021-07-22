@@ -19,9 +19,10 @@ from kaffee_server.db import get_db
 bp = Blueprint("api", __name__, url_prefix="/api")
 
 
-def generate_data(start=time()) -> dict:
+def generate_data(start=time(), sensitive=False) -> dict:
     """Creates a dict with user data and statistics, to be sent to the client"""
-    users = get_users()
+    users = get_users(sensitive)
+
     return {
         "users": users,
         "statistics": {
@@ -46,7 +47,7 @@ def verify_key(api_key: str) -> bool:
 def api():
     """Return a list of users"""
     start = time()
-    return jsonify(generate_data(start))
+    return jsonify(generate_data(start=start, sensitive=False))
 
 
 @bp.route("transactions", methods=["POST"])
@@ -64,4 +65,4 @@ def process_transactions():
 
     insert_transactions(data)
 
-    return jsonify(generate_data(start))
+    return jsonify(generate_data(start=start, sensitive=True))
