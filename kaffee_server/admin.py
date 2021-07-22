@@ -53,7 +53,10 @@ def login_required(view):
 @login_required
 def index():
     return render_template(
-        "admin/admin.html", users=get_users(), transactions=get_transactions()
+        "admin/admin.html",
+        admin=g.user,
+        users=get_users(),
+        transactions=get_transactions(),
     )
 
 
@@ -229,4 +232,4 @@ def load_logged_in_user():
 @bp.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for(".index"))
+    return redirect("/")

@@ -26,8 +26,14 @@
                 <li><a href="/admin">Adminbereich</a></li>
                 <li><a href="/api">Rohdaten</a></li>
             </ul>
-
         </div>
+        {% if admin %}
+        <div class="uk-navbar-right">
+            <div class="uk-navbar-item">
+                <a href="/admin/logout" class="uk-button uk-button-primary">Logout</a>
+            </div>
+        </div>
+        {% endif %}
     </nav>
     <div class="uk-container uk-container-xlarge">
         {% with messages = get_flashed_messages() %}
