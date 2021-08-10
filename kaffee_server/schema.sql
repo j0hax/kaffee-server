@@ -1,9 +1,9 @@
 -- User database
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(255) NOT NULL,
-    last_update FLOAT DEFAULT (strftime('%s','now')),
-    transponder_code VARCHAR(255)
+    name TEXT NOT NULL,
+    last_update REAL DEFAULT (strftime('%s','now')),
+    transponder_code TEXT
 );
 
 CREATE TRIGGER IF NOT EXISTS update_last_update
@@ -17,13 +17,13 @@ CREATE TRIGGER IF NOT EXISTS update_last_update
 CREATE TABLE IF NOT EXISTS transactions (
     user INTEGER NOT NULL,
     amount INTEGER NOT NULL,
-    description varchar(255),
-    timestamp FLOAT DEFAULT (strftime('%s','now'))
+    description TEXT,
+    timestamp REAL DEFAULT (strftime('%s','now'))
 );
 
 -- Clients which need an API Key to log in
 CREATE TABLE IF NOT EXISTS clients (
-    api_key varchar(255) NOT NULL UNIQUE
+    api_key TEXT NOT NULL UNIQUE
 );
 
 -- View which calculates balances from transactions
@@ -39,8 +39,8 @@ CREATE VIEW balances AS
 
 -- Admins allowed to log and administer 
 CREATE TABLE IF NOT EXISTS admins (
-    username varchar(255) NOT NULL UNIQUE,
-    password char(60) NOT NULL
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
 );
 
 -- DEFAULT Admin account: user admin, password Barista*1
