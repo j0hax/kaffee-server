@@ -11,14 +11,15 @@ CREATE TRIGGER IF NOT EXISTS update_last_update
     ON users
     BEGIN
     UPDATE users SET last_update = strftime('%s','now') WHERE id = old.id;
-    END;
+END;
 
 -- Transactions from users
 CREATE TABLE IF NOT EXISTS transactions (
     user INTEGER NOT NULL,
     amount INTEGER NOT NULL,
     description TEXT,
-    timestamp REAL DEFAULT (strftime('%s','now'))
+    timestamp REAL DEFAULT (strftime('%s','now')),
+    FOREIGN KEY(user) REFERENCES users(id)
 );
 
 -- Clients which need an API Key to log in
