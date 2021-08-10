@@ -1,33 +1,33 @@
 -- User database
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(255) NOT NULL,
-    last_update FLOAT DEFAULT (strftime('%s','now')),
-    transponder_code VARCHAR(255)
+    name TEXT NOT NULL,
+    last_update REAL DEFAULT (strftime('%s','now')),
+    transponder_code TEXT UNIQUE
 );
 
-CREATE TRIGGER IF NOT EXISTS update_last_update
+CREATE TRIGGER update_last_update
     AFTER UPDATE
     ON users
     BEGIN
     UPDATE users SET last_update = strftime('%s','now') WHERE id = old.id;
-    END;
+END;
 
 -- Transactions from users
-CREATE TABLE IF NOT EXISTS transactions (
+CREATE TABLE transactions (
     user INTEGER NOT NULL,
-    amount INTEGER NOT NULL,
-    description varchar(255),
-    timestamp FLOAT DEFAULT (strftime('%s','now'))
+    amount INTEGER NOT NULL CHECK(amount <> 0),
+    description TEXT,
+    timestamp REAL DEFAULT (strftime('%s','now')),
+    FOREIGN KEY(user) REFERENCES users(id)
 );
 
 -- Clients which need an API Key to log in
-CREATE TABLE IF NOT EXISTS clients (
-    api_key varchar(255) NOT NULL UNIQUE
+CREATE TABLE clients (
+    api_key TEXT NOT NULL UNIQUE
 );
 
 -- View which calculates balances from transactions
-DROP VIEW IF EXISTS balances;
 CREATE VIEW balances AS
     SELECT users.id,
     sum(CASE WHEN transactions.amount > 0 THEN 1 ELSE 0 END) AS deposit_count,
@@ -38,9 +38,9 @@ CREATE VIEW balances AS
     INNER JOIN users ON transactions.user = users.id GROUP BY users.id;
 
 -- Admins allowed to log and administer 
-CREATE TABLE IF NOT EXISTS admins (
-    username varchar(255) NOT NULL UNIQUE,
-    password char(60) NOT NULL
+CREATE TABLE admins (
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
 );
 
 -- DEFAULT Admin account: user admin, password Barista*1
