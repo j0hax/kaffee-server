@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     last_update REAL DEFAULT (strftime('%s','now')),
-    transponder_code TEXT
+    transponder_code TEXT UNIQUE
 );
 
 CREATE TRIGGER IF NOT EXISTS update_last_update
