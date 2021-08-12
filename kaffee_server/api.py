@@ -24,6 +24,8 @@ def generate_data(start=time(), sensitive=False) -> dict:
     users = get_users(sensitive)
 
     return {
+        "timestamp": time(),
+        "sensitive": sensitive,
         "users": users,
         "statistics": {
             "motd": current_app.config["MOTD"],
