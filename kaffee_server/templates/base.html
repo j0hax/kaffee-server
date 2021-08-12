@@ -38,7 +38,7 @@
         </div>
         {% endif %}
     </nav>
-    <div class="uk-container uk-container-xlarge">
+    <div class="uk-container uk-container-xlarge" uk-height-viewport="expand: true">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         {% for message in messages %}
@@ -53,10 +53,16 @@
         {% block content %}
         {% endblock %}
     </div>
-    <footer class="uk-container uk-margin-top">
+    <footer class="uk-section uk-section-muted uk-margin-xlarge-top">
+    <div class="uk-container uk-container-xlarge">
         {% block footer %}
-        <small>Nur für den internen gebrauch</small>
         {% endblock %}
+        <div class="uk-grid-small uk-grid" uk-grid>
+            <div class="uk-width-expand"><span uk-icon="warning"></span> Nur für den internen gebrauch.</div>
+            <div>
+                <a href="https://github.com/j0hax/kaffee-server/">Quellcode</a> &bull; <a href="https://github.com/j0hax/kaffee-client/">Client</a> &bull; <a href="https://github.com/j0hax/kaffee-server/issues/new">Bug Melden</a>
+            </div>
+        </div>
     </footer>
 </body>
 </html>
