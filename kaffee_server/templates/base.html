@@ -13,6 +13,9 @@
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.0/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.0/dist/js/uikit-icons.min.js"></script>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='2615.svg') }}">
+
     <title>Kaffeesystem: {% block title %}{% endblock %}</title>
     {% endblock %}
 </head>
@@ -20,7 +23,7 @@
 <body>
     <nav class="uk-navbar-container uk-margin-bottom" uk-navbar>
         <div class="uk-navbar-left">
-            <a href="/" class="uk-navbar-item uk-logo">Kaffee-Server</a>
+            <a href="/" class="uk-navbar-item uk-logo">Kaffeesystem</a>
             <ul class="uk-navbar-nav">
                 <li><a href="/">Übersicht</a></li>
                 <li><a href="/admin">Adminbereich</a></li>
@@ -56,5 +59,4 @@
         {% endblock %}
     </footer>
 </body>
-
 </html>
