@@ -100,7 +100,7 @@ def save_table():
     if request.form["action"] == "delete":
         delete_user(user_id)
         flash("Deleted user " + user_name)
-        return redirect(url_for("admin"))
+        return redirect(url_for(".index"))
 
     # Assume we are getting one row
     user = [
