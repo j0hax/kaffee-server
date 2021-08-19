@@ -20,6 +20,8 @@ CREATE TABLE transactions (
     description TEXT,
     timestamp REAL DEFAULT (strftime('%s','now')),
     FOREIGN KEY(user) REFERENCES users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- Clients which need an API Key to log in
