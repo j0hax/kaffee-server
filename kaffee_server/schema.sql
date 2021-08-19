@@ -6,13 +6,6 @@ CREATE TABLE users (
     transponder_code TEXT UNIQUE
 );
 
-CREATE TRIGGER update_last_update
-    AFTER UPDATE
-    ON users
-    BEGIN
-    UPDATE users SET last_update = strftime('%s','now') WHERE id = old.id;
-END;
-
 -- Transactions from users
 CREATE TABLE transactions (
     user INTEGER NOT NULL,
@@ -23,6 +16,13 @@ CREATE TABLE transactions (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+CREATE TRIGGER update_last_update
+    AFTER INSERT
+    ON transactions FOR EACH ROW
+    BEGIN
+        UPDATE users SET last_update = strftime('%s','now') WHERE users.id = new.user;
+    END;
 
 -- Clients which need an API Key to log in
 CREATE TABLE clients (
@@ -37,7 +37,7 @@ CREATE VIEW balances AS
     sum(CASE WHEN transactions.amount < 0 THEN 1 ELSE 0 END) AS withdrawal_count,
     sum(CASE WHEN transactions.amount < 0 THEN transactions.amount ELSE 0 END) AS withdrawals,
     SUM(transactions.amount) AS balance FROM transactions
-    INNER JOIN users ON transactions.user = users.id GROUP BY users.id;
+    INNER JOIN users ON transactions.user = users.id GROUP BY users.id ORDER BY users.last_update DESC;
 
 -- Admins allowed to log and administer 
 CREATE TABLE admins (
