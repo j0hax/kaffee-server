@@ -2,3 +2,4 @@ Flask==1.0.2
 Flask_Login==0.4.1
 Flask_Cors==3.0.8
 python_bcrypt==0.3.2
+bjoern==3.1.0

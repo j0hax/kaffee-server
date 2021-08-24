@@ -2,23 +2,23 @@ FROM python:3
 
 WORKDIR /usr/src/app
 
+# Install and set locales and libev
+RUN apt-get update
+RUN apt-get install -y locales locales-all libev-dev
+
+ENV LC_ALL de_DE.UTF-8
+
+# Install python requirements
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Install and set locales
-RUN apt-get update
-RUN apt-get install -y locales locales-all
-
-ENV LC_ALL de_DE.UTF-8
-
+# Initialize the database
 ENV FLASK_APP="kaffee_server"
-
-EXPOSE 5000
-
 RUN flask init-db
 
-ENTRYPOINT [ "flask" ]
-
-CMD [ "run", "-h", "0.0.0.0" ]
+# Run WSGI
+EXPOSE 5000
+ENTRYPOINT [ "python3" ]
+CMD [ "wsgi.py" ]
