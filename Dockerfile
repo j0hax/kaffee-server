@@ -14,7 +14,6 @@ RUN apt-get install -y locales locales-all
 ENV LC_ALL de_DE.UTF-8
 
 ENV FLASK_APP="kaffee_server"
-ENV FLASK_ENV="development"
 
 EXPOSE 5000
 
