@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Einstellungen{% endblock %}
+{% block content %}
+<form class="uk-form-horizontal uk-margin-large" action="/settings/save/price" method="POST">
+
+    <div class="uk-margin">
+        <label class="uk-form-label" for="price_field">Preis</label>
+        <div class="uk-form-controls">
+            <input class="uk-input" id="price_field" name="price" type="number" value="{{config.DRINK_PRICE}}"
+                step="0.01">
+        </div>
+    </div>
+
+    <button type="submit" class="uk-button uk-button-primary">Speichern</button>
+</form>
+{% endblock %}
