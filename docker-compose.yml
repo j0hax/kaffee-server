@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+    server:
+        build: .
+        ports:
+            - "5000:5000"
+        volumes:
+            - instance:/usr/src/app/instance
+
+volumes:
+    instance:
