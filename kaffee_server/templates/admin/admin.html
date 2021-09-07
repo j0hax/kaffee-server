@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Adminbereich{% endblock %}
 {% block content %}
-<h2 class="uk-heading-line"><span>Nutzerdaten</span></h2>
+<h2 class="uk-heading-line" id="users"><span>Nutzerdaten</span></h2>
 <table class="uk-table uk-table-hover">
     <caption>Zum Bearbeiten eines Feldes klicken</caption>
     <thead>
@@ -64,7 +64,7 @@
         </form>
     </tbody>
 </table>
-<h2 class="uk-heading-line"><span>Kassenaktivität</span></h2>
+<h2 class="uk-heading-line" id="ledger"><span>Kassenaktivität</span></h2>
 <h3>Letzten {{transactions | length}} Transaktionen</h3>
 <table class="uk-table uk-table-hover">
     <thead>
@@ -113,7 +113,7 @@
             uk-icon="check"></span>Speichern</button>
 </form>
 
-<h2 class="uk-heading-line"><span>Backups</span></h2>
+<h2 class="uk-heading-line" id="backups"><span>Backups</span></h2>
 <a href="/admin/dump/users" class="uk-button uk-button-default">
     <span uk-icon="users"></span> Nutzerdaten Backup
 </a>
@@ -128,7 +128,7 @@
     <button class="uk-button uk-button-primary" type="submit" tabindex="-1">Hochladen</button>
 </form>
 
-<h2 class="uk-heading-line"><span>Admin-Konto</span></h2>
+<h2 class="uk-heading-line" id="account"><span>Admin-Konto</span></h2>
 <form action="/admin/save/password" method="post">
     <input type="password" placeholder="Passwort" class="uk-input uk-width-auto" name="password" /><button type="submit"
         class="pure-button pure-button-primary uk-width-auto">Ändern</button>
