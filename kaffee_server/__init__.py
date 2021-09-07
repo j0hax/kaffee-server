@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 ################################################################################
 ## __init__.py
 ################################################################################
@@ -8,7 +10,7 @@
 ## $ flask run
 ################################################################################
 
-import os
+import os, json
 
 from flask import Flask, render_template, session
 from flask_cors import CORS
@@ -39,18 +41,18 @@ def create_app(test_config=None):
         BEANINFO={"brand": "Tchibo", "type": "Espresso, Mailänder Art"},
     )
 
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile("config.py", silent=True)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
-
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    app.config.from_file("config.json", json.load, silent=True)
+
+    # Initialize the database
+    from . import db
+
+    db.init_app(app)
 
     # a simple page that displays key statistics
     # more can be done in a seperate file later
@@ -60,20 +62,12 @@ def create_app(test_config=None):
             "overview.html", users=get_users(), transactions=get_transactions()
         )
 
-    # register database
-    from . import db
-
-    db.init_app(app)
-
     # register API blueprint
-    from . import api
+    from . import api, admin, settings
 
     app.register_blueprint(api.bp)
-
-    # register admin blueprint
-    from . import admin
-
     app.register_blueprint(admin.bp)
+    app.register_blueprint(settings.bp)
 
     # Add our custom filters
     @app.template_filter("from_cents")

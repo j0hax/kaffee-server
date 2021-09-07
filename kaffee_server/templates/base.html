@@ -26,7 +26,19 @@
             <a href="/" class="uk-navbar-item uk-logo">Kaffeesystem</a>
             <ul class="uk-navbar-nav">
                 <li><a href="/">Übersicht</a></li>
-                <li><a href="/admin">Adminbereich</a></li>
+                <li>
+                    <a href="#">Adminbereich</a>
+                    <div class="uk-navbar-dropdown">
+                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                            <li class="uk-nav-header">Verwalten</li>
+                            <li><a href="/admin">Nutzer</a></li>
+                            <li><a href="/admin">Kasse</a></li>
+                            <li class="uk-nav-header">Einstellungen</li>
+                            <li><a href="/settings">Preise</a></li>
+                            <li><a href="/settings">Server</a></li>
+                        </ul>
+                    </div>
+                </li>
                 <li><a href="/api">Rohdaten</a></li>
             </ul>
         </div>
@@ -54,15 +66,18 @@
         {% endblock %}
     </div>
     <footer class="uk-section uk-section-muted uk-margin-xlarge-top">
-    <div class="uk-container uk-container-xlarge">
-        {% block footer %}
-        {% endblock %}
-        <div class="uk-grid-small uk-grid" uk-grid>
-            <div class="uk-width-expand"><span uk-icon="warning"></span> Nur für den internen gebrauch.</div>
-            <div>
-                <a href="https://github.com/j0hax/kaffee-server">Quellcode</a> &bull; <a href="https://github.com/j0hax/kaffee-ui">Client</a> &bull; <a href="https://github.com/j0hax/kaffee-server/issues/new/choose">Bug Melden</a>
+        <div class="uk-container uk-container-xlarge">
+            {% block footer %}
+            {% endblock %}
+            <div class="uk-grid-small uk-grid" uk-grid>
+                <div class="uk-width-expand"><span uk-icon="warning"></span> Nur für den internen gebrauch.</div>
+                <div>
+                    <a href="https://github.com/j0hax/kaffee-server">Quellcode</a> &bull; <a
+                        href="https://github.com/j0hax/kaffee-ui">Client</a> &bull; <a
+                        href="https://github.com/j0hax/kaffee-server/issues/new/choose">Bug Melden</a>
+                </div>
             </div>
-        </div>
     </footer>
 </body>
+
 </html>

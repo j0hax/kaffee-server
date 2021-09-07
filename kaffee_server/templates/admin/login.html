@@ -16,6 +16,7 @@
                     required />
             </div>
         </div>
+        <input type="hidden" name="next" value="{{ request.args.get('next', '') }}" />
         <div class="uk-margin">
             <button type="submit" class="uk-button uk-button-primary">Einloggen</button>
         </div>
