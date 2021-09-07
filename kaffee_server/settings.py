@@ -45,5 +45,5 @@ def index():
 @login_required
 def change_price():
     price = request.form["price"]
-    save_configuration({"DRINK_PRICE": price})
+    save_configuration({"DRINK_PRICE": int(price)})
     return redirect(url_for(".index"))
