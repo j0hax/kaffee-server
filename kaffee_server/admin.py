@@ -83,7 +83,7 @@ def save_transaction():
     data = {
         "user": 0,
         "amount": -(int(request.form["amount"]) * 100),
-        "description": f"[ADMIN/{request.form['user']}] {request.form['description']}",
+        "description": f"[{request.form['user']}] {request.form['description']}",
         "timestamp": time.time(),
     }
     insert_transaction(data)

@@ -6,6 +6,9 @@ CREATE TABLE users (
     transponder_code TEXT UNIQUE
 );
 
+-- User ID 0 is a special system user
+INSERT INTO users (id, name) VALUES (0, "System");
+
 -- Transactions from users
 CREATE TABLE transactions (
     user INTEGER NOT NULL,

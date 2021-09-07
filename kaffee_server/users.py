@@ -24,7 +24,7 @@ def get_users(sensitive=True) -> dict:
     """
     cur = get_db().cursor()
     cur.execute(
-        "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id ORDER BY withdrawal_count DESC;"
+        "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id > 0 ORDER BY withdrawal_count DESC;"
     )
     results = cur.fetchall()
     array = []
