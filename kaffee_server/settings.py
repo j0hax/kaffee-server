@@ -41,9 +41,13 @@ def index():
     )
 
 
-@bp.route("/save/price", methods=["POST"])
+@bp.route("/save", methods=["POST"])
 @login_required
 def change_price():
     price = request.form["price"]
-    save_configuration({"DRINK_PRICE": int(price)})
+    brand = request.form["brand"]
+    bean = request.form["bean"]
+    save_configuration(
+        {"DRINK_PRICE": int(price), "BEANINFO": {"brand": brand, "type": bean}}
+    )
     return redirect(url_for(".index"))

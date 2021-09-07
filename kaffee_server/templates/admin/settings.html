@@ -1,16 +1,26 @@
 {% extends "base.html" %}
 {% block title %}Einstellungen{% endblock %}
 {% block content %}
-<form class="uk-form-horizontal uk-margin-large" action="/settings/save/price" method="POST">
+<form class="uk-form-horizontal uk-margin-large" action="/settings/save" method="POST">
 
     <div class="uk-margin">
-        <label class="uk-form-label" for="price_field">Preis</label>
+        <label class="uk-form-label" for="price_field">Preis (Cent)</label>
         <div class="uk-form-controls">
-            <input class="uk-input" id="price_field" name="price" type="number" value="{{config.DRINK_PRICE}}"
-                step="0.01">
+            <input class="uk-input" id="price_field" name="price" type="number" value="{{config.DRINK_PRICE}}" step="1">
         </div>
     </div>
-
+    <div class="uk-margin">
+        <label class="uk-form-label" for="brand_field">Kaffee Marke</label>
+        <div class="uk-form-controls">
+            <input class="uk-input" id="brand_field" name="brand" type="text" value="{{config.BEANINFO.brand}}">
+        </div>
+    </div>
+    <div class="uk-margin">
+        <label class="uk-form-label" for="bean_field">Bohnen Typ:</label>
+        <div class="uk-form-controls">
+            <input class="uk-input" id="bean_field" name="bean" type="text" value="{{config.BEANINFO.type}}">
+        </div>
+    </div>
     <button type="submit" class="uk-button uk-button-primary">Speichern</button>
 </form>
 {% endblock %}
