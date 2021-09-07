@@ -34,7 +34,7 @@ def create_app(test_config=None):
 
     CORS(app)
     app.config.from_mapping(
-        SECRET_KEY="dev",
+        SECRET_KEY=os.urandom(32),
         DATABASE=os.path.join(app.instance_path, "kaffee.sqlite"),
         DRINK_PRICE=40,
         MOTD="Willkommen!",
