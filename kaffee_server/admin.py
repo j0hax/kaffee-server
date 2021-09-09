@@ -108,7 +108,7 @@ def save_table():
             "id": user_id,
             "name": user_name,
             "lastUpdate": time.time(),
-            "transponder": request.form["transponder_code"],
+            "transponder": request.form["transponder_code"] or None,
         }
     ]
 
