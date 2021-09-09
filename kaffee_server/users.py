@@ -17,6 +17,15 @@ def delete_user(id: int):
     get_db().commit()
 
 
+def undo_transaction(id: int):
+    """Deletes the last transaction of a user."""
+    with get_db() as cur:
+        cur.execute(
+            "DELETE FROM transactions WHERE user = ? ORDER BY timestamp DESC LIMIT 1;",
+            (id,),
+        )
+
+
 def get_users(sensitive=True) -> dict:
     """Return a list of users
 

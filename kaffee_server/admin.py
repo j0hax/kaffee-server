@@ -27,6 +27,7 @@ from kaffee_server.users import (
     get_transactions,
     insert_transaction,
     delete_user,
+    undo_transaction,
 )
 
 import time
@@ -100,6 +101,11 @@ def save_table():
     if request.form["action"] == "delete":
         delete_user(user_id)
         flash("Deleted user " + user_name)
+        return redirect(url_for(".index"))
+
+    if request.form["action"] == "undo":
+        undo_transaction(user_id)
+        flash(f"Letzte Transaktion von {user_name} gelöscht.")
         return redirect(url_for(".index"))
 
     # Assume we are getting one row
