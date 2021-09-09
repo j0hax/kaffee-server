@@ -2,7 +2,7 @@
 {% block title %}Einstellungen{% endblock %}
 {% block content %}
 <form class="uk-form-horizontal" action="/settings/save" method="POST">
-    <fieldset class="uk-fieldset">
+    <fieldset class="uk-fieldset" id="coffee">
         <legend class="uk-legend">Kaffee</legend>
         <div class="uk-margin">
             <label class="uk-form-label" for="price_field">Preis (Cent)</label>
@@ -24,7 +24,7 @@
             </div>
         </div>
     </fieldset>
-    <fieldset class="uk-fieldset">
+    <fieldset class="uk-fieldset" id="contact">
         <legend class="uk-legend">Bezugsperson</legend>
         <div class="uk-margin">
             <label class="uk-form-label" for="contact_name">Name:</label>
