@@ -39,6 +39,11 @@ def create_app(test_config=None):
         DRINK_PRICE=40,
         MOTD="Willkommen!",
         BEANINFO={"brand": "Tchibo", "type": "Espresso, Mailänder Art"},
+        CONTACT={
+            "name": "Johannes Arnold",
+            "email": "johannes.arnold@stud.uni-hannover.de",
+            "phone": "",
+        },
     )
 
     # ensure the instance folder exists

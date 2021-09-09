@@ -47,7 +47,16 @@ def change_price():
     price = request.form["price"]
     brand = request.form["brand"]
     bean = request.form["bean"]
+
+    name = request.form["contactname"]
+    email = request.form["contactemail"]
+    phone = request.form["contactphone"]
+
     save_configuration(
-        {"DRINK_PRICE": int(price), "BEANINFO": {"brand": brand, "type": bean}}
+        {
+            "DRINK_PRICE": int(price),
+            "BEANINFO": {"brand": brand, "type": bean},
+            "CONTACT": {"name": name, "email": email, "phone": phone},
+        }
     )
     return redirect(url_for(".index"))

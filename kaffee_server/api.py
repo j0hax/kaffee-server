@@ -31,6 +31,7 @@ def generate_data(start=time(), sensitive=False) -> dict:
             "motd": current_app.config["MOTD"],
             "beanInfo": current_app.config["BEANINFO"],
             "drinkPrice": current_app.config["DRINK_PRICE"],
+            "contact": current_app.config["CONTACT"],
             "queryTime": time() - start,
         },
     }
