@@ -125,13 +125,11 @@ def save_table():
         # TODO: ensure there are no float innaccuracies
         payment = round(float(request.form["payment"]) * 100)
         if payment > 0:
-            db = get_db()
-            c = db.cursor()
-            c.execute(
-                "INSERT INTO transactions (user, amount, description) VALUES (?,?,?)",
-                (user[0]["id"], payment, "Einzahlung durch Adminbereich"),
-            )
-            db.commit()
+            with get_db() as con:
+                con.execute(
+                    "INSERT INTO transactions (user, amount, description) VALUES (?,?,?)",
+                    (user[0]["id"], payment, "Einzahlung durch Adminbereich"),
+                )
 
     flash("Updated user " + request.form["name"])
 
