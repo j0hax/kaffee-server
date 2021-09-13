@@ -7,6 +7,7 @@ RUN apt-get update
 RUN apt-get install -y locales locales-all libev-dev
 
 ENV LC_ALL de_DE.UTF-8
+RUN ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 
 # Install python requirements
 COPY requirements.txt ./
