@@ -17,6 +17,7 @@ from flask import (
     url_for,
     send_file,
     current_app,
+    escape,
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -43,7 +44,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            return redirect(url_for("admin.login", next=request.url))
+            return redirect(url_for("admin.login", next=request.path))
 
         return view(**kwargs)
 
@@ -214,7 +215,7 @@ def login():
             session.clear()
             session["user_id"] = user["username"]
             if next_url:
-                return redirect(next_url)
+                return redirect(escape(next_url))
             return redirect(url_for(".admin"))
 
         flash(error)
