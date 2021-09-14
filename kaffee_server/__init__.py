@@ -68,11 +68,12 @@ def create_app(test_config=None):
         )
 
     # register API blueprint
-    from . import api, admin, settings
+    from . import api, admin, settings, error_handlers
 
     app.register_blueprint(api.bp)
     app.register_blueprint(admin.bp)
     app.register_blueprint(settings.bp)
+    app.register_blueprint(error_handlers.bp)
 
     # Add our custom filters
     @app.template_filter("from_cents")
