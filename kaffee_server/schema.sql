@@ -12,7 +12,7 @@ INSERT INTO users (id, name) VALUES (0, "System");
 -- Transactions from users
 CREATE TABLE transactions (
     user INTEGER NOT NULL,
-    amount INTEGER NOT NULL CHECK(amount <> 0),
+    amount INTEGER NOT NULL,
     description TEXT,
     timestamp REAL DEFAULT (strftime('%s','now')),
     FOREIGN KEY(user) REFERENCES users(id)
