@@ -103,6 +103,13 @@ def get_transactions(limit=10) -> dict:
     return cur.fetchall()
 
 
+def sum_transactions() -> int:
+    """Sums all transactions"""
+    cur = get_db().cursor()
+    cur.execute("SELECT SUM(amount) from transactions;")
+    return cur.fetchone()[0]
+
+
 def insert_transactions(pending: list):
     """Insert a list of transactions"""
     for transaction in pending:

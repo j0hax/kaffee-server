@@ -18,7 +18,7 @@ from flask_cors import CORS
 import locale
 from datetime import datetime
 
-from kaffee_server.users import get_users, get_transactions
+from kaffee_server.users import get_users, sum_transactions
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -64,7 +64,7 @@ def create_app(test_config=None):
     @app.route("/")
     def overview():
         return render_template(
-            "overview.html", users=get_users(), transactions=get_transactions()
+            "overview.html", users=get_users(), balance=sum_transactions()
         )
 
     # register API blueprint
