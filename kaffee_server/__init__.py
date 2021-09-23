@@ -63,9 +63,7 @@ def create_app(test_config=None):
     # more can be done in a seperate file later
     @app.route("/")
     def overview():
-        return render_template(
-            "overview.html", users=get_users(), balance=sum_transactions()
-        )
+        return render_template("overview.html", users=get_users())
 
     # register API blueprint
     from . import api, admin, settings, error_handlers

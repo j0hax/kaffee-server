@@ -70,6 +70,8 @@
     </tbody>
 </table>
 <h2 class="uk-heading-line" id="ledger"><span>Kassenaktivität</span></h2>
+<h3>Kasse: {{ balance | pretty_currency }}</h3>
+<h3>Einzahlungen: {{ users | sum(attribute='deposits') | pretty_number }}</h3>
 <h3>Letzten {{transactions | length}} Transaktionen</h3>
 <table class="uk-table uk-table-hover">
     <thead>

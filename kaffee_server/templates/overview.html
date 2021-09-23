@@ -5,8 +5,6 @@
 <h2 class="uk-heading-line"><span>Statistiken</span></h2>
 <h3>Nutzer: {{ users | length }}</h3>
 <h3>Kaffees Getrunken: {{ users | sum(attribute='withdrawals') | pretty_number }}</h3>
-<h3>Kasse: {{ balance | pretty_currency }} ({{ users | sum(attribute='deposits') |
-    pretty_number }} Einzahlungen)</h3>
 
 <h2 class="uk-heading-line"><span>Nutzerübersicht</span></h2>
 <table class="uk-table uk-table-hover">

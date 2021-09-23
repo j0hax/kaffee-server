@@ -28,6 +28,7 @@ from kaffee_server.users import (
     get_transactions,
     insert_transaction,
     delete_user,
+    sum_transactions,
     undo_transaction,
 )
 
@@ -58,6 +59,7 @@ def index():
         "admin/admin.html",
         admin=g.user,
         users=get_users(),
+        balance=sum_transactions(),
         transactions=get_transactions(),
     )
 
