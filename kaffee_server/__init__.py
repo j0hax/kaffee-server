@@ -10,19 +10,25 @@
 ## $ flask run
 ################################################################################
 
-import os, json
+import os, json, threading
 
-from flask import Flask, render_template, session
+from flask import Flask, render_template
 from flask_cors import CORS
+
+import logging
 
 import locale
 from datetime import datetime
 
-from kaffee_server.users import get_users, sum_transactions
+from kaffee_server.users import get_users
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 locale.setlocale(locale.LC_ALL, "de_DE")
+
+logging.basicConfig(level=os.environ.get("LOGLEVEL", logging.INFO))
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(test_config=None):
@@ -34,6 +40,7 @@ def create_app(test_config=None):
 
     CORS(app)
     app.config.from_mapping(
+        SCHEDULER_API_ENABLED=True,
         SECRET_KEY=os.urandom(32),
         DATABASE=os.path.join(app.instance_path, "kaffee.sqlite"),
         DRINK_PRICE=40,
