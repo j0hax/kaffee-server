@@ -5,11 +5,12 @@
 ################################################################################
 
 import os
-from datetime import datetime
 from kaffee_server.db import get_db
 from kaffee_server import logger
 from flask import current_app
 from flask_apscheduler import APScheduler
+from glob import iglob
+import filecmp
 from time import strftime
 
 scheduler = APScheduler()
@@ -38,3 +39,27 @@ def backup_database():
 
         with get_db() as db:
             db.execute("VACUUM main INTO ?", (backup_file,))
+
+        prune_backups(pattern="BACKUP-*.sqlite")
+
+
+def prune_backups(pattern="*"):
+    """Deduplicate the backup directory"""
+
+    backup_dir = ""
+
+    with scheduler.app.app_context():
+        backup_dir = current_app.config["BACKUP_DIR"]
+
+    expr = backup_dir + os.path.sep + pattern
+
+    logger.info(f"Pruning {expr}")
+
+    all_files = iglob(expr)
+
+    for i in all_files:
+        for j in all_files:
+            if i != j and os.path.exists(i) and os.path.exists(j):
+                if filecmp.cmp(i, j, shallow=False):
+                    os.remove(i)
+                    logger.warning(f"Removed identical backup file {i}!")
