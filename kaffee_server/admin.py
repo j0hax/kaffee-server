@@ -141,7 +141,7 @@ def save_table():
 @bp.route("/dump/users")
 def dump_users():
     """Downloads a CSV of user data"""
-    outfile = tempfile.NamedTemporaryFile(mode="w")
+    outfile = tempfile.NamedTemporaryFile(mode="w", encoding="utf-8")
     users = get_users()
 
     dict_writer = csv.DictWriter(outfile, users[0].keys())
