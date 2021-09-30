@@ -43,6 +43,7 @@ def create_app(test_config=None):
         SCHEDULER_API_ENABLED=True,
         SECRET_KEY=os.urandom(32),
         DATABASE=os.path.join(app.instance_path, "kaffee.sqlite"),
+        BACKUP_DIR=os.path.join(app.instance_path, "backups"),
         DRINK_PRICE=40,
         MOTD="Willkommen!",
         BEANINFO={"brand": "Tchibo", "type": "Espresso, Mailänder Art"},

@@ -10,6 +10,7 @@ from kaffee_server.db import get_db
 from kaffee_server import logger
 from flask import current_app
 from flask_apscheduler import APScheduler
+from time import strftime
 
 scheduler = APScheduler()
 
@@ -26,11 +27,14 @@ def vacuum_database():
 def backup_database():
     """Saves an optimized copy of the database to instance folder"""
     with scheduler.app.app_context():
-        # Ensure the backup folder in the instance folder exists
-        dir = current_app.instance_path + "/backups"
-        os.makedirs(dir, exist_ok=True)
+        backup_dir = current_app.config["BACKUP_DIR"]
 
-        filename = f"{dir}/backup-{datetime.now()}.sqlite"
+        # Ensure the backup folder exists
+        os.makedirs(backup_dir, exist_ok=True)
+
+        backup_file = os.path.join(
+            backup_dir, strftime("BACKUP-%Y-%m-%d-%H%M%S.sqlite")
+        )
 
         with get_db() as db:
-            db.execute("VACUUM main INTO ?", (filename,))
+            db.execute("VACUUM main INTO ?", (backup_file,))
