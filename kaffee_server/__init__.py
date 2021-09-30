@@ -96,7 +96,7 @@ def create_app(test_config=None):
     @app.template_filter("pretty_date")
     def pretty_date(timestamp: float) -> str:
         """ Formats a UNIX Timestamp as a localized string """
-        return datetime.fromtimestamp(timestamp).strftime("%a, %x um %X")
+        return datetime.fromtimestamp(timestamp).strftime("%A, %x")
 
     @app.template_filter("pretty_number")
     def pretty_number(number: float) -> str:
