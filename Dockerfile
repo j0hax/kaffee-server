@@ -6,8 +6,8 @@ WORKDIR /usr/src/app
 RUN apt-get update
 RUN apt-get install -y locales locales-all libev-dev
 
-ENV LC_ALL de_DE.UTF-8
-RUN ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+ENV LC_ALL="de_DE.UTF-8"
+ENV TZ="Europe/Berlin"
 
 # Install python requirements
 COPY requirements.txt ./
