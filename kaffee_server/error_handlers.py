@@ -1,5 +1,5 @@
 from werkzeug.exceptions import HTTPException
-from flask import json, Blueprint, render_template
+from flask import Blueprint, render_template
 
 bp = Blueprint("error_handlers", __name__)
 
