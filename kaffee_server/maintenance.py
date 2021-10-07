@@ -6,7 +6,6 @@
 
 import os
 from kaffee_server.db import get_db
-from kaffee_server import logger
 from flask import current_app
 from flask_apscheduler import APScheduler
 from glob import iglob
@@ -53,7 +52,7 @@ def prune_backups(pattern="*"):
 
     expr = backup_dir + os.path.sep + pattern
 
-    logger.info(f"Pruning {expr}")
+    current_app.logger.info(f"Pruning {expr}")
 
     all_files = iglob(expr)
 
@@ -62,4 +61,4 @@ def prune_backups(pattern="*"):
             if i != j and os.path.exists(i) and os.path.exists(j):
                 if filecmp.cmp(i, j, shallow=False):
                     os.remove(i)
-                    logger.warning(f"Removed identical backup file {i}!")
+                    current_app.logger.warning(f"Removed identical backup file {i}!")
