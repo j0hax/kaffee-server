@@ -10,13 +10,11 @@
 ## $ flask run
 ################################################################################
 
+import logging
 import os, json, threading
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_cors import CORS
-
-import logging
-
 import locale
 from datetime import datetime
 
@@ -25,10 +23,6 @@ from kaffee_server.users import get_users
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 locale.setlocale(locale.LC_ALL, "de_DE")
-
-logging.basicConfig(level=os.environ.get("LOGLEVEL", logging.INFO))
-
-logger = logging.getLogger(__name__)
 
 
 def create_app(test_config=None):
@@ -61,6 +55,16 @@ def create_app(test_config=None):
         pass
 
     app.config.from_file("config.json", json.load, silent=True)
+
+    # Set up the logger
+    logfile = os.path.join(app.instance_path, "server.log")
+    filelogger = logging.FileHandler(logfile, encoding="utf-8")
+    # Log everything to disk
+    filelogger.setLevel(logging.DEBUG)
+    # Allow for overriding the default level
+    pref_level = os.environ.get("LOGLEVEL", logging.INFO)
+    app.logger.setLevel(pref_level)
+    app.logger.addHandler(filelogger)
 
     # Initialize the database
     from . import db
@@ -103,5 +107,14 @@ def create_app(test_config=None):
     def pretty_number(number: float) -> str:
         """ Formats a number with localized seperators """
         return locale.format_string("%d", number, grouping=True)
+
+    @app.after_request
+    def log_request(response):
+        """Log everything other than GET requests"""
+        if request.method != "GET":
+            app.logger.info(
+                f"{request.remote_addr} -> {request.method} {request.full_path} -> {response.status}"
+            )
+        return response
 
     return app
