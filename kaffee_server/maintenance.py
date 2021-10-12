@@ -19,8 +19,10 @@ scheduler = APScheduler()
 def vacuum_database():
     """Optimizes the Database file"""
     with scheduler.app.app_context():
+        current_app.logger.info(f"Vacuuming database")
         with get_db() as con:
             con.execute("VACUUM")
+        current_app.logger.info(f"Finished vacuuming")
 
 
 @scheduler.task("interval", days=1)
@@ -36,10 +38,12 @@ def backup_database():
             backup_dir, strftime("BACKUP-%Y-%m-%d-%H%M%S.sqlite")
         )
 
-        current_app.logger.debug(f"Writing Backup to {backup_file}")
+        current_app.logger.info(f"Backing up to {backup_file}")
 
         with get_db() as db:
             db.execute("VACUUM main INTO ?", (backup_file,))
+
+        current_app.logger.info(f"Finished backing up")
 
         prune_backups(pattern="BACKUP-*.sqlite")
 
@@ -54,11 +58,9 @@ def prune_backups(pattern="*"):
 
     expr = backup_dir + os.path.sep + pattern
 
-    current_app.logger.info(f"Pruning {expr}")
+    current_app.logger.debug(f"Pruning {expr}")
 
     all_files = iglob(expr)
-
-    current_app.logger.debug(f"Comparing {len(iglob)} backups to another")
 
     for i in all_files:
         for j in all_files:
