@@ -43,7 +43,9 @@ def verify_key(api_key: str) -> bool:
     cur.execute(
         "SELECT EXISTS(SELECT 1 FROM clients WHERE api_key = ?) AS result", (api_key,)
     )
-    return cur.fetchone()["result"]
+    result = cur.fetchone()["result"]
+    current_app.logger.info(f"Key {api_key} valid: {result}")
+    return result
 
 
 @bp.route("/")

@@ -4,6 +4,9 @@
 ## Arbeitet mit der Datenbank zur Kontomanipulation
 ################################################################################
 
+from sqlite3.dbapi2 import Timestamp
+from time import time
+from flask import current_app
 from kaffee_server.db import get_db
 
 
@@ -12,6 +15,7 @@ def delete_user(id: int):
 
     Removes the user from the database, however debts are kept.
     """
+    current_app.logger.warning(f"Deleting user with ID {id}")
     cur = get_db().cursor()
     cur.execute("DELETE FROM users WHERE id = ?", (id,))
     get_db().commit()
@@ -19,6 +23,7 @@ def delete_user(id: int):
 
 def undo_transaction(id: int):
     """Deletes the last transaction of a user."""
+    current_app.logger.warning(f"Deleting transaction with ID {id}")
     with get_db() as cur:
         cur.execute(
             "DELETE FROM transactions WHERE user = ? ORDER BY timestamp DESC LIMIT 1;",
@@ -31,6 +36,7 @@ def get_users(sensitive=True) -> dict:
 
     These can be directly converted to JSON for the client or used for further processing.
     """
+    current_app.logger.debug(f"Retrieving users, include sensitive data: {sensitive}")
     cur = get_db().cursor()
     cur.execute(
         "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id > 0 ORDER BY withdrawal_count DESC;"
@@ -63,6 +69,7 @@ def merge_users(client_users: list):
 
     Commonly used to merge cached data returned from a client.
     """
+    current_app.logger.debug(f"Merging {len(client_users)}")
     cur = get_db().cursor()
     for user in client_users:
         # Check if user exists
@@ -95,6 +102,7 @@ def merge_users(client_users: list):
 
 def get_transactions(limit=10) -> dict:
     """Return a list of transactions"""
+    current_app.logger.debug(f"Retrieving last {limit} transactions")
     cur = get_db().cursor()
     cur.execute(
         "SELECT name, amount, description, timestamp FROM transactions LEFT JOIN users ON transactions.user = users.id ORDER BY timestamp DESC LIMIT ?;",
@@ -105,28 +113,41 @@ def get_transactions(limit=10) -> dict:
 
 def sum_transactions() -> int:
     """Sums all transactions"""
+    start_time = time()
     cur = get_db().cursor()
     cur.execute("SELECT SUM(amount) from transactions;")
+    current_app.logger.debug(
+        f"Summing all transactions took {time() - start_time} milliseconds"
+    )
     return cur.fetchone()[0]
 
 
 def insert_transactions(pending: list):
     """Insert a list of transactions"""
+    current_app.logger.debug(f"Inserting {len(pending)} transactions")
     for transaction in pending:
         insert_transaction(transaction)
 
 
 def insert_transaction(transaction: dict):
     """Insert a transaction into the database"""
+
+    user = transaction["user"]
+    amount = transaction["amount"]
+    description = transaction["description"]
+    timestamp = transaction["timestamp"]
+
+    current_app.logger.info(f"Booking {amount / 100} towards user {user}")
+
     cur = get_db().cursor()
     # Insert transaction
     cur.execute(
         "INSERT INTO transactions VALUES (?,?,?,?)",
         (
-            transaction["user"],
-            transaction["amount"],
-            transaction["description"],
-            transaction["timestamp"],
+            user,
+            amount,
+            description,
+            timestamp,
         ),
     )
     get_db().commit()

@@ -36,6 +36,8 @@ def backup_database():
             backup_dir, strftime("BACKUP-%Y-%m-%d-%H%M%S.sqlite")
         )
 
+        current_app.logger.debug(f"Writing Backup to {backup_file}")
+
         with get_db() as db:
             db.execute("VACUUM main INTO ?", (backup_file,))
 
@@ -55,6 +57,8 @@ def prune_backups(pattern="*"):
     current_app.logger.info(f"Pruning {expr}")
 
     all_files = iglob(expr)
+
+    current_app.logger.debug(f"Comparing {len(iglob)} backups to another")
 
     for i in all_files:
         for j in all_files:

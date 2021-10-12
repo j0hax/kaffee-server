@@ -67,6 +67,8 @@ def index():
 @bp.route("/save/password", methods=["POST"])
 @login_required
 def save_admin_password():
+    """ Change the admin password """
+    current_app.logger.warning("Changing administrator password")
     password = request.form["password"]
     hashed = generate_password_hash(password)
     username = session.get("user_id")
@@ -141,6 +143,7 @@ def save_table():
 @bp.route("/dump/users")
 def dump_users():
     """Downloads a CSV of user data"""
+    current_app.logger.info("User data dump requested")
     outfile = tempfile.NamedTemporaryFile(mode="w", encoding="utf-8")
     users = get_users()
 
@@ -155,6 +158,7 @@ def dump_users():
 @bp.route("/dump/database")
 def dump_db():
     """Downloads a compressed dump of the database"""
+    current_app.logger.info("Database dump requested")
     db = get_db()
     with gzip.open(tempfile.NamedTemporaryFile().name, "wb") as f:
         for line in db.iterdump():
@@ -171,6 +175,8 @@ def dump_db():
 def restore_db():
     """Restores a compressed dump of the database"""
     if request.method == "POST":
+        current_app.logger.warning("Attempting to restore from dump")
+
         # check if the post request has the file part
         if "file" not in request.files:
             flash("Keine Datei!")
@@ -213,12 +219,14 @@ def login():
             error = "Incorrect password."
 
         if error is None:
+            current_app.logger.info(f"{username} logged in")
             session.clear()
             session["user_id"] = user["username"]
             if next_url:
                 return redirect(escape(next_url))
             return redirect(url_for(".admin"))
 
+        current_app.logger.warn(f"{error} ({username}:{password})")
         flash(error)
 
     return render_template("admin/login.html")
@@ -240,5 +248,8 @@ def load_logged_in_user():
 
 @bp.route("/logout")
 def logout():
+    if g.user:
+        username = g.user["username"]
+        current_app.logger.info(f"Logging out {username}")
     session.clear()
     return redirect("/")

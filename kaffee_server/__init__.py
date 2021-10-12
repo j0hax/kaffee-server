@@ -59,12 +59,10 @@ def create_app(test_config=None):
     # Set up the logger
     logfile = os.path.join(app.instance_path, "server.log")
     filelogger = logging.FileHandler(logfile, encoding="utf-8")
-    # Log everything to disk
-    filelogger.setLevel(logging.DEBUG)
     # Allow for overriding the default level
     pref_level = os.environ.get("LOGLEVEL", logging.INFO)
-    app.logger.setLevel(pref_level)
     app.logger.addHandler(filelogger)
+    app.logger.setLevel(pref_level)
 
     # Initialize the database
     from . import db
@@ -108,13 +106,15 @@ def create_app(test_config=None):
         """ Formats a number with localized seperators """
         return locale.format_string("%d", number, grouping=True)
 
-    @app.after_request
-    def log_request(response):
+    @app.before_request
+    def log_request():
         """Log everything other than GET requests"""
+
+        rstr = lambda r: f"{r.remote_addr} -> {r.method} {r.full_path}"
+
         if request.method != "GET":
-            app.logger.info(
-                f"{request.remote_addr} -> {request.method} {request.full_path} -> {response.status}"
-            )
-        return response
+            app.logger.info(rstr(request))
+        else:
+            app.logger.debug(rstr(request))
 
     return app
