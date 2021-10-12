@@ -108,13 +108,9 @@ def create_app(test_config=None):
 
     @app.before_request
     def log_request():
-        """Log everything other than GET requests"""
-
-        rstr = lambda r: f"{r.remote_addr} -> {r.method} {r.full_path}"
-
-        if request.method != "GET":
-            app.logger.info(rstr(request))
-        else:
-            app.logger.debug(rstr(request))
+        """Log requests"""
+        app.logger.debug(
+            f"{request.remote_addr} -> {request.method} {request.full_path}"
+        )
 
     return app
