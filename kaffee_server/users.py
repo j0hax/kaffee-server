@@ -4,8 +4,7 @@
 ## Arbeitet mit der Datenbank zur Kontomanipulation
 ################################################################################
 
-from sqlite3.dbapi2 import Timestamp
-from time import time
+from time import perf_counter
 from flask import current_app
 from kaffee_server.db import get_db
 
@@ -113,11 +112,11 @@ def get_transactions(limit=10) -> dict:
 
 def sum_transactions() -> int:
     """Sums all transactions"""
-    start_time = time()
+    start_time = perf_counter()
     cur = get_db().cursor()
     cur.execute("SELECT SUM(amount) from transactions;")
     current_app.logger.debug(
-        f"Summing all transactions took {time() - start_time} milliseconds"
+        f"Summing all transactions took {perf_counter() - start_time} milliseconds"
     )
     return cur.fetchone()[0]
 
