@@ -10,7 +10,7 @@ from flask import current_app
 from flask_apscheduler import APScheduler
 from glob import iglob
 import filecmp
-from time import strftime
+from time import strftime, time
 
 scheduler = APScheduler()
 
@@ -63,8 +63,13 @@ def prune_backups(pattern="*"):
     all_files = iglob(expr)
 
     for i in all_files:
+        # Remove files older than 1 month
+        age = time() - os.path.getctime(i)
+        if age > 60 * 60 * 24 * 31:
+            current_app.logger.warning(f"Removing old file {i}")
+            os.remove(i)
         for j in all_files:
             if i != j and os.path.exists(i) and os.path.exists(j):
                 if filecmp.cmp(i, j, shallow=False):
+                    current_app.logger.warning(f"Removing identical backup file {i}")
                     os.remove(i)
-                    current_app.logger.warning(f"Removed identical backup file {i}!")
