@@ -41,13 +41,13 @@ def index():
 @bp.route("/save", methods=["POST"])
 @login_required
 def change_price():
-    price = request.form["price"]
-    brand = request.form["brand"]
-    bean = request.form["bean"]
+    price = request.form.get("price")
+    brand = request.form.get("brand")
+    bean = request.form.get("bean")
 
-    name = request.form["contactname"]
-    email = request.form["contactemail"]
-    phone = request.form["contactphone"]
+    name = request.form.get("contactname")
+    email = request.form.get("contactemail")
+    phone = request.form.get("contactphone")
 
     save_configuration(
         {

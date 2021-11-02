@@ -69,7 +69,7 @@ def index():
 def save_admin_password():
     """ Change the admin password """
     current_app.logger.warning("Changing administrator password")
-    password = request.form["password"]
+    password = request.form.get("password")
     hashed = generate_password_hash(password)
     username = session.get("user_id")
 
@@ -88,8 +88,8 @@ def save_admin_password():
 def save_transaction():
     data = {
         "user": 0,
-        "amount": -(int(request.form["amount"]) * 100),
-        "description": f"[{request.form['user']}] {request.form['description']}",
+        "amount": -(int(request.form.get("amount")) * 100),
+        "description": f"[{request.form.get('user')}] {request.form.get('description')}",
         "timestamp": time.time(),
     }
     insert_transaction(data)
@@ -100,15 +100,16 @@ def save_transaction():
 @bp.route("/save/user", methods=["POST"])
 @login_required
 def save_table():
-    user_id = request.form["id"]
-    user_name = request.form["name"]
+    user_id = request.form.get("id")
+    user_name = request.form.get("name")
+    action = request.form.get("action")
 
-    if request.form["action"] == "delete":
+    if action == "delete":
         delete_user(user_id)
         flash("Deleted user " + user_name)
         return redirect(url_for(".index"))
 
-    if request.form["action"] == "undo":
+    if action == "undo":
         undo_transaction(user_id)
         flash(f"Letzte Transaktion von {user_name} gelöscht.")
         return redirect(url_for(".index"))
@@ -119,7 +120,7 @@ def save_table():
             "id": user_id,
             "name": user_name,
             "lastUpdate": time.time(),
-            "transponder": request.form["transponder_code"] or None,
+            "transponder": request.form.get("transponder_code"),
         }
     ]
 
@@ -128,14 +129,14 @@ def save_table():
     # Check if a deposit was made
     if "payment" in request.form:
         # TODO: ensure there are no float innaccuracies
-        payment = round(float(request.form["payment"]) * 100)
+        payment = round(float(request.form.get("payment")) * 100)
         with get_db() as db:
             db.execute(
                 "INSERT INTO transactions (user, amount, description) VALUES (?,?,?)",
                 (user[0]["id"], payment, "Transaktion durch Adminbereich"),
             )
 
-    flash("Updated user " + request.form["name"])
+    flash("Updated user " + request.form.get("name"))
 
     return redirect(url_for(".index"))
 
@@ -184,7 +185,7 @@ def restore_db():
 
         # Rename the old Database
         close_db()
-        db_name = current_app.config["DATABASE"]
+        db_name = current_app.config.get("DATABASE")
         os.rename(db_name, db_name + ".old")
 
         # Read the file into the database
@@ -204,8 +205,8 @@ def restore_db():
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        username = request.form.get("username")
+        password = request.form.get("password")
         next_url = request.form.get("next")
         db = get_db()
         error = None

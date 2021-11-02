@@ -29,7 +29,7 @@ def vacuum_database():
 def backup_database():
     """Saves an optimized copy of the database to instance folder"""
     with scheduler.app.app_context():
-        backup_dir = current_app.config["BACKUP_DIR"]
+        backup_dir = current_app.config.get("BACKUP_DIR")
 
         # Ensure the backup folder exists
         os.makedirs(backup_dir, exist_ok=True)
@@ -54,7 +54,7 @@ def prune_backups(pattern="*"):
     backup_dir = ""
 
     with scheduler.app.app_context():
-        backup_dir = current_app.config["BACKUP_DIR"]
+        backup_dir = current_app.config.get("BACKUP_DIR")
 
     expr = backup_dir + os.path.sep + pattern
 

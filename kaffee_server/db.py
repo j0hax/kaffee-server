@@ -9,7 +9,7 @@ def get_db():
     current_app.logger.debug("Database connection requested")
     if "db" not in g:
         conn = sqlite3.connect(
-            current_app.config["DATABASE"], detect_types=sqlite3.PARSE_DECLTYPES
+            current_app.config.get("DATABASE"), detect_types=sqlite3.PARSE_DECLTYPES
         )
         conn.execute("PRAGMA foreign_keys = ON")
         conn.row_factory = sqlite3.Row

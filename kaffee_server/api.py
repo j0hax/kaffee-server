@@ -28,10 +28,10 @@ def generate_data(start=perf_counter(), sensitive=False) -> dict:
         "sensitive": sensitive,
         "users": users,
         "statistics": {
-            "motd": current_app.config["MOTD"],
-            "beanInfo": current_app.config["BEANINFO"],
-            "drinkPrice": current_app.config["DRINK_PRICE"],
-            "contact": current_app.config["CONTACT"],
+            "motd": current_app.config.get("MOTD"),
+            "beanInfo": current_app.config.get("BEANINFO"),
+            "drinkPrice": current_app.config.get("DRINK_PRICE"),
+            "contact": current_app.config.get("CONTACT"),
             "queryTime": perf_counter() - start,
         },
     }
