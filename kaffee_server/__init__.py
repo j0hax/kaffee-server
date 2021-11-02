@@ -17,7 +17,8 @@ from flask import Flask, render_template, request
 from flask_cors import CORS
 import locale
 from datetime import datetime
-
+from platform import system
+from time import time
 from kaffee_server.users import get_users
 
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -112,5 +113,13 @@ def create_app(test_config=None):
         app.logger.debug(
             f"{request.remote_addr} -> {request.method} {request.full_path}"
         )
+
+    @app.after_request
+    def set_header(request):
+        """Add custom headers to each request"""
+        request.headers["Server"] = f"Kaffee-Server/{0.1} ({system()})"
+        request.date = time()
+        request.headers["X-Powered-By"] = "Coffee, black."
+        return request
 
     return app
