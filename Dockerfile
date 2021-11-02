@@ -1,10 +1,10 @@
-FROM python:3
+FROM python:3-slim
 
 WORKDIR /usr/src/app
 
 # Install and set locales and libev
 RUN apt-get update
-RUN apt-get install -y locales locales-all libev-dev
+RUN apt-get install -y locales locales-all libev-dev gcc
 
 ENV LC_ALL="de_DE.UTF-8"
 ENV TZ="Europe/Berlin"
