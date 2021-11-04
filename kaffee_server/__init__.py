@@ -20,6 +20,7 @@ from datetime import datetime
 from platform import system
 from time import time
 from kaffee_server.users import get_users
+from flask_talisman import Talisman
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -34,6 +35,10 @@ def create_app(test_config=None):
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
     CORS(app)
+    
+    # Use secure defaults provided by Google
+    Talisman(app)
+    
     app.config.from_mapping(
         SCHEDULER_API_ENABLED=True,
         SECRET_KEY=os.urandom(32),
