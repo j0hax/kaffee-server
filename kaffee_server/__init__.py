@@ -14,13 +14,11 @@ import logging
 import os, json
 
 from flask import Flask, render_template, request
-from flask_cors import CORS
 import locale
 from datetime import datetime
 from platform import system
 from time import time
 from kaffee_server.users import get_users
-from flask_talisman import Talisman
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -34,11 +32,6 @@ def create_app(test_config=None):
     # App is behind one proxy that sets the -For and -Host headers.
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-    CORS(app)
-    
-    # Use secure defaults provided by Google
-    Talisman(app)
-    
     app.config.from_mapping(
         SCHEDULER_API_ENABLED=True,
         SECRET_KEY=os.urandom(32),
