@@ -14,6 +14,7 @@ import logging
 import os, json
 
 from flask import Flask, render_template, request
+from flask_cors import CORS
 import locale
 from datetime import datetime
 from platform import system
@@ -28,6 +29,7 @@ locale.setlocale(locale.LC_ALL, "de_DE")
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    CORS(app)
 
     # App is behind one proxy that sets the -For and -Host headers.
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
