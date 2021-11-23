@@ -1,10 +1,5 @@
-{% extends "base.html" %}
+{% extends "errorpages/base.html" %}
 {% block title %}Fehler {{e.code}}{% endblock %}
-{% block content %}
-<div class="uk-align-center uk-width-1-2@l">
-    <img class="uk-align-center uk-width-1-4@m" src="{{ url_for('static', filename='1F50D.svg') }}" alt="Warning">
-    <p class="uk-text-center">
-        {{e.description}}
-    </p>
-</div>
+{% block information %}
+<p>Bitte überprüfe deine Anfrage.</p>
 {% endblock %}

@@ -1,0 +1,10 @@
+{% extends "errorpages/base.html" %}
+{% block title %}Datenbankfehler{% endblock %}
+{% block information %}
+<p>Dieser Fehler stammt höchstwahrscheinlich durch</p>
+<ul>
+    <li>Fehleingabe neuer Daten: Bitte wiederhole den Vorgang und überprüfe dass keine Daten fehlerhaft oder doppelt
+        sind.</li>
+    <li>Fehler mit dem Datenbankschema: Ein automatisch erstelltes Backup kann wiederhergestellt werden.</li>
+</ul>
+{% endblock %}

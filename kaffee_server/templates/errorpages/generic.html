@@ -1,18 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Fehler{% endblock %}
-{% block content %}
-<div class="uk-align-center uk-width-1-2@l">
-    <img class="uk-align-center uk-width-1-4@m" src="{{ url_for('static', filename='26A0.svg') }}" alt="Warning">
-    <p>Eine Ausnahmesituation ist entstanden.</p>
-    <p>Diese kann durch mehrere Ereignisse entstanden sein:</p>
-    <ul>
-        <li>Fehleingabe in Daten; vor allem das Speichern von Nutzerdaten.</li>
-        <li>Bug in dieser Software</li>
-        <li>Problem mit dem Server</li>
-    </ul>
-    <p>Folgender <code>{{ e.__class__.__name__ }}</code> wurde dabei generiert:</p>
-    <pre>
-{{e}}
-</pre>
-</div>
+{% block information %}
+<p>Eine Ausnahmesituation ist entstanden.</p>
+<p>Bitte überprüfe die Eingabedaten und versuche es nochmal.</p>
 {% endblock %}
