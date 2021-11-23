@@ -4,37 +4,14 @@
 ## REST-Schnittstelle
 ################################################################################
 
-from flask import (
-    Blueprint,
-    request,
-    jsonify,
-    current_app,
-)
+from flask import Blueprint, request, jsonify, current_app, redirect
 
 from time import time, perf_counter
 
 from kaffee_server.users import get_users, insert_transactions
 from kaffee_server.db import get_db
 
-bp = Blueprint("api", __name__, url_prefix="/api")
-
-
-def generate_data(start=perf_counter(), sensitive=False) -> dict:
-    """Creates a dict with user data and statistics, to be sent to the client"""
-    users = get_users(sensitive)
-
-    return {
-        "timestamp": time(),
-        "sensitive": sensitive,
-        "users": users,
-        "statistics": {
-            "motd": current_app.config.get("MOTD"),
-            "beanInfo": current_app.config.get("BEANINFO"),
-            "drinkPrice": current_app.config.get("DRINK_PRICE"),
-            "contact": current_app.config.get("CONTACT"),
-            "queryTime": perf_counter() - start,
-        },
-    }
+bp = Blueprint("version1", __name__, url_prefix="/v1")
 
 
 def verify_key(api_key: str) -> bool:
@@ -52,7 +29,33 @@ def verify_key(api_key: str) -> bool:
 @bp.route("/")
 def api():
     """Return a list of users"""
-    return jsonify(generate_data(sensitive=False))
+    return jsonify(info(sensitive=False))
+
+
+@bp.route("info")
+def info(start=perf_counter(), sensitive=False) -> dict:
+    """Creates a dict with user data and statistics, to be sent to the client"""
+    users = get_users(sensitive)
+
+    return {
+        "servedby": __name__,
+        "timestamp": time(),
+        "sensitive": sensitive,
+        "users": users,
+        "statistics": {
+            "motd": current_app.config.get("MOTD"),
+            "beanInfo": current_app.config.get("BEANINFO"),
+            "drinkPrice": current_app.config.get("DRINK_PRICE"),
+            "contact": current_app.config.get("CONTACT"),
+            "queryTime": perf_counter() - start,
+        },
+    }
+
+
+@bp.route("config")
+def send_config():
+    # Sends important bits of the server configuration as a JSON-formatted string
+    return str(current_app.config)
 
 
 @bp.route("transactions", methods=["POST"])
@@ -69,4 +72,4 @@ def process_transactions():
 
     insert_transactions(data)
 
-    return jsonify(generate_data(start=start, sensitive=True))
+    return jsonify(info(start=start, sensitive=True))
