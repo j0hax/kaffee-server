@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.0/dist/js/uikit-icons.min.js"></script>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='2615.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='icons/2615.svg') }}">
 
     <title>Kaffeesystem: {% block title %}{% endblock %}</title>
     {% endblock %}
@@ -31,10 +31,10 @@
                     <div class="uk-navbar-dropdown">
                         <ul class="uk-nav uk-navbar-dropdown-nav">
                             <li class="uk-nav-header">Verwalten</li>
-                            <li><a href="/admin#users">Nutzer</a></li>
-                            <li><a href="/admin#ledger">Kasse</a></li>
-                            <li><a href="/admin#backups">Backups</a></li>
-                            <li><a href="/admin#account">Konto</a></li>
+                            <li><a href="/admin/users">Nutzer</a></li>
+                            <li><a href="/admin/transactions">Kasse</a></li>
+                            <li><a href="/admin/backups">Backups</a></li>
+                            <li><a href="/admin/account">Konto</a></li>
                             <li class="uk-nav-header">Einstellungen</li>
                             <li><a href="/settings#coffee">Kaffee</a></li>
                             <li><a href="/settings#contact">Bezugsperson</a></li>

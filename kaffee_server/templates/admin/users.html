@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Adminbereich{% endblock %}
+{% block title %}Nutzer{% endblock %}
 {% block content %}
 <h2 class="uk-heading-line" id="users"><span>Nutzerdaten</span></h2>
 <table class="uk-table uk-table-hover">
@@ -69,75 +69,4 @@
         </form>
     </tbody>
 </table>
-<h2 class="uk-heading-line" id="ledger"><span>Kassenaktivität</span></h2>
-<h3>Kasse: {{ balance | pretty_currency }}</h3>
-<h3>Einzahlungen: {{ users | sum(attribute='deposits') | pretty_number }}</h3>
-<h3>Letzten {{transactions | length}} Transaktionen</h3>
-<table class="uk-table uk-table-hover">
-    <thead>
-        <tr>
-            <th>Nutzer</th>
-            <th>Betrag</th>
-            <th>Verwendungszweck</th>
-            <th>Zeitstempel</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for t in transactions %}
-        <tr>
-            <td>{{ t.name }}</td>
-            <td>{{ t.amount | pretty_currency }}</td>
-            <td>{{ t.description }}</td>
-            <td>{{ t.timestamp | pretty_date }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<h3>Neue Kassenauszahlung</h3>
-<p class="uk-text-meta">Für eine arbiträre Einzahlung, einen negativen Betrag eingeben.</p>
-<form class="uk-form-horizontal uk-margin" action="/admin/save/transaction" method="post">
-    <div class="uk-margin">
-        <label class="uk-form-label" for="form-name">Name</label>
-        <div class="uk-form-controls">
-            <input class="uk-input" id="form-name" type="text" name="user" value="Administrator" required>
-        </div>
-    </div>
-    <div class="uk-margin">
-        <label class="uk-form-label" for="form-amount">Betrag</label>
-        <div class="uk-form-controls">
-            <input class="uk-input" id="form-amount" type="number" name="amount" value="0" step="0.01" required>
-        </div>
-    </div>
-    <div class="uk-margin">
-        <label class="uk-form-label" for="form-description">Verwendungszweck</label>
-        <div class="uk-form-controls">
-            <input class="uk-input" id="form-description" type="text" name="description" placeholder="Bohnen gekauft?"
-                required>
-        </div>
-    </div>
-
-    <button type="submit" class="uk-button uk-button-primary uk-margin"><span class="uk-margin-small-right"
-            uk-icon="check"></span>Speichern</button>
-</form>
-
-<h2 class="uk-heading-line" id="backups"><span>Backups</span></h2>
-<a href="/admin/dump/users" class="uk-button uk-button-default">
-    <span uk-icon="users"></span> Nutzerdaten Backup
-</a>
-<a href="/admin/dump/database" class="uk-button uk-button-primary">
-    <span uk-icon="database"></span> Vollständiges Datenbank Backup
-</a>
-
-<h3>Datenbank-Backup Hochladen</h3>
-
-<form method="post" enctype="multipart/form-data" action="/admin/dump/restore">
-    <input type="file" name="file">
-    <button class="uk-button uk-button-primary" type="submit" tabindex="-1">Hochladen</button>
-</form>
-
-<h2 class="uk-heading-line" id="account"><span>Admin-Konto</span></h2>
-<form action="/admin/save/password" method="post">
-    <input type="password" placeholder="Passwort" class="uk-input uk-width-auto" name="password" /><button type="submit"
-        class="pure-button pure-button-primary uk-width-auto">Ändern</button>
-</form>
 {% endblock %}

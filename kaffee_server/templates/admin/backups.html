@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Backups{% endblock %}
+{% block content %}
+<h2 class="uk-heading-line" id="backups"><span>Backups</span></h2>
+<a href="/admin/dump/users" class="uk-button uk-button-default">
+    <span uk-icon="users"></span> Nutzerdaten Backup
+</a>
+<a href="/admin/dump/database" class="uk-button uk-button-primary">
+    <span uk-icon="database"></span> Vollständiges Datenbank Backup
+</a>
+
+<h3>Datenbank-Backup Hochladen</h3>
+
+<form method="post" enctype="multipart/form-data" action="/admin/dump/restore">
+    <input type="file" name="file">
+    <button class="uk-button uk-button-primary" type="submit" tabindex="-1">Hochladen</button>
+</form>
+{% endblock %}

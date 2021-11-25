@@ -53,15 +53,37 @@ def login_required(view):
 
 
 @bp.route("/")
-@login_required
 def index():
+    return redirect(url_for(".users"))
+
+
+@bp.route("/users")
+@login_required
+def users():
+    return render_template("admin/users.html", admin=g.user, users=get_users())
+
+
+@bp.route("/transactions")
+@login_required
+def transactions():
     return render_template(
-        "admin/admin.html",
+        "admin/transactions.html",
         admin=g.user,
-        users=get_users(),
         balance=sum_transactions(),
         transactions=get_transactions(),
     )
+
+
+@bp.route("/backups")
+@login_required
+def backups():
+    return render_template("admin/backups.html", admin=g.user)
+
+
+@bp.route("/account")
+@login_required
+def admin_account():
+    return render_template("admin/account.html", admin=g.user)
 
 
 @bp.route("/save/password", methods=["POST"])
@@ -80,7 +102,7 @@ def save_admin_password():
         )
         flash("Passwort geändert.")
 
-    return redirect(url_for(".index"))
+    return redirect(url_for(".account"))
 
 
 @bp.route("/save/transaction", methods=["POST"])
@@ -94,7 +116,7 @@ def save_transaction():
     }
     insert_transaction(data)
 
-    return redirect(url_for(".index"))
+    return redirect(url_for(".transactions"))
 
 
 @bp.route("/save/user", methods=["POST"])
@@ -107,12 +129,12 @@ def save_table():
     if action == "delete":
         delete_user(user_id)
         flash("Deleted user " + user_name)
-        return redirect(url_for(".index"))
+        return redirect(url_for(".users"))
 
     if action == "undo":
         undo_transaction(user_id)
         flash(f"Letzte Transaktion von {user_name} gelöscht.")
-        return redirect(url_for(".index"))
+        return redirect(url_for(".users"))
 
     # Assume we are getting one row
     user = [
@@ -138,7 +160,7 @@ def save_table():
 
     flash("Updated user " + request.form.get("name"))
 
-    return redirect(url_for(".index"))
+    return redirect(url_for(".users"))
 
 
 @bp.route("/dump/users")
