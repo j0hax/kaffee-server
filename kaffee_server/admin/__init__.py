@@ -70,7 +70,7 @@ def transactions():
         "admin/transactions.html",
         admin=g.user,
         balance=sum_transactions(),
-        transactions=get_transactions(),
+        transactions=get_transactions(limit=100),
     )
 
 

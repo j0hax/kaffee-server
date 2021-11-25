@@ -3,27 +3,6 @@
 {% block content %}
 <h3>Kassenbestand: {{ balance | pretty_currency }}</h3>
 <h3>Einzahlungen: {{ users | sum(attribute='deposits') | pretty_number }}</h3>
-<h3>Letzten {{transactions | length}} Transaktionen</h3>
-<table class="uk-table uk-table-hover">
-    <thead>
-        <tr>
-            <th>Nutzer</th>
-            <th>Betrag</th>
-            <th>Verwendungszweck</th>
-            <th>Zeitstempel</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for t in transactions %}
-        <tr>
-            <td>{{ t.name }}</td>
-            <td>{{ t.amount | pretty_currency }}</td>
-            <td>{{ t.description }}</td>
-            <td>{{ t.timestamp | pretty_date }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 <h3>Neue Kassenauszahlung</h3>
 <p class="uk-text-meta">Für eine arbiträre Einzahlung, einen negativen Betrag eingeben.</p>
 <form class="uk-form-horizontal uk-margin" action="/admin/save/transaction" method="post">
@@ -50,4 +29,25 @@
     <button type="submit" class="uk-button uk-button-primary uk-margin"><span class="uk-margin-small-right"
             uk-icon="check"></span>Speichern</button>
 </form>
+<h3>Letzten {{transactions | length}} Transaktionen</h3>
+<table class="uk-table uk-table-hover">
+    <thead>
+        <tr>
+            <th>Nutzer</th>
+            <th>Betrag</th>
+            <th>Verwendungszweck</th>
+            <th>Zeitstempel</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.name }}</td>
+            <td>{{ t.amount | pretty_currency }}</td>
+            <td>{{ t.description }}</td>
+            <td>{{ t.timestamp | pretty_date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
