@@ -16,6 +16,8 @@ bp = Blueprint("version1", __name__, url_prefix="/v1")
 
 def verify_key(api_key: str) -> bool:
     """Verifies an API key in the database"""
+    if api_key is None:
+        return False
     cur = get_db().cursor()
     cur.execute(
         "SELECT EXISTS(SELECT 1 FROM clients WHERE api_key = ?) AS result", (api_key,)
@@ -29,7 +31,10 @@ def verify_key(api_key: str) -> bool:
 @bp.route("/")
 def api():
     """Return a list of users"""
-    return jsonify(info(sensitive=False))
+    if verify_key(request.headers.get("X-API-KEY")):
+        return jsonify(info(sensitive=True))
+    else:
+        return jsonify(info(sensitive=False))
 
 
 @bp.route("info")
@@ -65,9 +70,7 @@ def process_transactions():
     data = request.get_json()
 
     # verify API key
-    if not "X-API-KEY" in request.headers or not verify_key(
-        request.headers["X-API-KEY"]
-    ):
+    if not verify_key(request.headers.get("X-API-KEY")):
         return jsonify("Error: unauthenticated"), 401
 
     insert_transactions(data)
