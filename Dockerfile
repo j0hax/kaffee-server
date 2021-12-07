@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 # Install and set locales and libev
 RUN apt-get update
-RUN apt-get install -y locales locales-all libev-dev gcc
+RUN apt-get install -y locales locales-all libev-dev gcc patchelf
 
 ENV LC_ALL="de_DE.UTF-8"
 ENV TZ="Europe/Berlin"
@@ -21,5 +21,9 @@ RUN flask init-db
 
 # Run WSGI
 EXPOSE 5000
-ENTRYPOINT [ "python3" ]
-CMD [ "wsgi.py" ]
+
+# Compile
+RUN pip install nuitka
+RUN python -m nuitka --follow-imports wsgi.py
+
+ENTRYPOINT [ "./wsgi.bin" ]
