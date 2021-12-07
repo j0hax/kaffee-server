@@ -20,6 +20,12 @@ bp = Blueprint("api", __name__, url_prefix="/api")
 bp.register_blueprint(v1.bp)
 
 
+def to_camel_case(snake: str) -> str:
+    # Helper function to convert snake case to camelcase
+    components = snake.split("_")
+    return components[0].lower() + "".join(x.title() for x in components[1:])
+
+
 @bp.route("/")
 def entry():
     return redirect(url_for(".version1.api"))

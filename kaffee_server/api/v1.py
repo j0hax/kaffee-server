@@ -8,6 +8,7 @@ from flask import Blueprint, request, jsonify, current_app, redirect
 
 from time import time, perf_counter
 import os, json
+import kaffee_server.api
 from kaffee_server.users import get_users, insert_transactions
 from kaffee_server.db import get_db
 
@@ -65,7 +66,9 @@ def send_config():
     if os.path.isfile(configpath):
         with open(configpath) as f:
             data = json.load(f)
-            return jsonify({k.lower(): v for k, v in data.items()})
+            return jsonify(
+                {kaffee_server.api.to_camel_case(k): v for k, v in data.items()}
+            )
     else:
         return jsonify("No config present")
 
