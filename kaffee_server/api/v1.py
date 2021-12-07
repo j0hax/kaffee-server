@@ -7,7 +7,7 @@
 from flask import Blueprint, request, jsonify, current_app, redirect
 
 from time import time, perf_counter
-
+import os, json
 from kaffee_server.users import get_users, insert_transactions
 from kaffee_server.db import get_db
 
@@ -60,7 +60,14 @@ def info(start=perf_counter(), sensitive=False) -> dict:
 @bp.route("config")
 def send_config():
     # Sends important bits of the server configuration as a JSON-formatted string
-    return str(current_app.config)
+    configpath = os.path.join(current_app.instance_path, "config.json")
+
+    if os.path.isfile(configpath):
+        with open(configpath) as f:
+            data = json.load(f)
+            return jsonify({k.lower(): v for k, v in data.items()})
+    else:
+        return jsonify("No config present")
 
 
 @bp.route("transactions", methods=["POST"])
