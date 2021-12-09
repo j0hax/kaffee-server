@@ -24,6 +24,6 @@ EXPOSE 5000
 
 # Compile
 RUN pip install nuitka
-RUN python -m nuitka --follow-imports wsgi.py
+RUN python -m nuitka --follow-imports --remove-output --no-pyi-file wsgi.py
 
 ENTRYPOINT [ "./wsgi.bin" ]
