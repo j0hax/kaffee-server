@@ -8,8 +8,8 @@ from flask import Blueprint, request, jsonify, current_app, redirect
 
 from time import time, perf_counter
 import os, json
-import kaffee_server.api
-from kaffee_server.users import get_users, insert_transactions
+import kaffee_server
+from kaffee_server.users import get_user, get_users, insert_transactions
 from kaffee_server.db import get_db
 
 bp = Blueprint("version1", __name__, url_prefix="/v1")
@@ -38,7 +38,6 @@ def api():
         return jsonify(info(sensitive=False))
 
 
-@bp.route("info")
 def info(start=perf_counter(), sensitive=False) -> dict:
     """Creates a dict with user data and statistics, to be sent to the client"""
     users = get_users(sensitive)
@@ -56,6 +55,14 @@ def info(start=perf_counter(), sensitive=False) -> dict:
             "queryTime": perf_counter() - start,
         },
     }
+
+
+@bp.route("user/<id>")
+def get_product(id):
+    try:
+        return jsonify(get_user(id))
+    except ValueError:
+        return kaffee_server.api.api_error(400, "User not found")
 
 
 @bp.route("config")
