@@ -30,6 +30,26 @@ def undo_transaction(id: int):
         )
 
 
+def get_user(id: int, sensitive=True) -> dict:
+    if sensitive:
+        with get_db() as cur:
+            result = cur.execute(
+                "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id = ?",
+                id,
+            ).fetchone()
+    else:
+        with get_db() as cur:
+            result = cur.execute(
+                "SELECT users.id AS userid, * FROM users WHERE users.id = ?",
+                id,
+            )
+
+    if result is None:
+        raise ValueError("User ID does not exist")
+    else:
+        return dict(result)
+
+
 def get_users(sensitive=True) -> dict:
     """Return a list of users
 
