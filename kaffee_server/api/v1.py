@@ -77,7 +77,7 @@ def send_config():
                 {kaffee_server.api.to_camel_case(k): v for k, v in data.items()}
             )
     else:
-        return jsonify("No config present")
+        return kaffee_server.api.api_error(404, "config.json not found")
 
 
 @bp.route("transactions", methods=["POST"])
@@ -88,7 +88,7 @@ def process_transactions():
 
     # verify API key
     if not verify_key(request.headers.get("X-API-KEY")):
-        return jsonify("Error: unauthenticated"), 401
+        return kaffee_server.api.api_error(401, "X-API-KEY not valid")
 
     insert_transactions(data)
 
