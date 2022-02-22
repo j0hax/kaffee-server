@@ -7,6 +7,7 @@
 from time import perf_counter
 from flask import current_app
 from kaffee_server.db import get_db
+from multiprocessing import Pool
 
 
 def delete_user(id: int):
@@ -83,40 +84,46 @@ def get_users(sensitive=True) -> dict:
     return array
 
 
+def insert_user(user: dict):
+    cur = get_db().cursor()
+
+    # Check if user exists
+    cur.execute("SELECT * FROM users WHERE id = ?", (user["id"],))
+    data = cur.fetchone()
+    if data:
+        if user["lastUpdate"] > data["last_update"]:
+            # update our user
+            current_app.logger.info(f"Updating user {user['name']}")
+            cur.execute(
+                "UPDATE users SET name=?,transponder_code=? WHERE id=?",
+                (
+                    user["name"],
+                    user["transponder"],
+                    user["id"],
+                ),
+            )
+    else:
+        current_app.logger.info(f"Inserting new user {user['name']}")
+        cur.execute(
+            "INSERT INTO users (name, last_update, transponder_code) VALUES (?,?,?)",
+            (
+                user["name"],
+                user["lastUpdate"],
+                user["transponder"],
+            ),
+        )
+
+    get_db().commit()
+
+
 def merge_users(client_users: list):
     """Compare and update users in the database
 
     Commonly used to merge cached data returned from a client.
     """
     current_app.logger.debug(f"Merging {len(client_users)}")
-    cur = get_db().cursor()
-    for user in client_users:
-        # Check if user exists
-        cur.execute("SELECT * FROM users WHERE id = ?", (user["id"],))
-        data = cur.fetchone()
-
-        if data:
-            if user["lastUpdate"] > data["last_update"]:
-                # update our user
-                cur.execute(
-                    "UPDATE users SET name=?,transponder_code=? WHERE id=?",
-                    (
-                        user["name"],
-                        user["transponder"],
-                        user["id"],
-                    ),
-                )
-        else:
-            cur.execute(
-                "INSERT INTO users (name, last_update, transponder_code) VALUES (?,?,?)",
-                (
-                    user["name"],
-                    user["lastUpdate"],
-                    user["transponder"],
-                ),
-            )
-
-    get_db().commit()
+    with Pool() as pool:
+        pool.map(insert_user, client_users)
 
 
 def get_transactions(limit=10) -> dict:
@@ -144,8 +151,8 @@ def sum_transactions() -> int:
 def insert_transactions(pending: list):
     """Insert a list of transactions"""
     current_app.logger.debug(f"Inserting {len(pending)} transactions")
-    for transaction in pending:
-        insert_transaction(transaction)
+    with Pool() as pool:
+        pool.map(insert_transaction, pending)
 
 
 def insert_transaction(transaction: dict):
@@ -156,7 +163,7 @@ def insert_transaction(transaction: dict):
     description = transaction["description"]
     timestamp = transaction["timestamp"]
 
-    current_app.logger.info(f"Booking {amount / 100} towards user {user}")
+    current_app.logger.info(f"Booking {amount / 100} towards user ID {user}")
 
     cur = get_db().cursor()
     # Insert transaction
