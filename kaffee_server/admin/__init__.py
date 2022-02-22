@@ -32,10 +32,12 @@ from kaffee_server.users import (
     undo_transaction,
 )
 
+import subprocess
 import time
 import csv
+from time import perf_counter
+from datetime import datetime
 import tempfile
-import gzip
 import os
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -89,7 +91,7 @@ def admin_account():
 @bp.route("/save/password", methods=["POST"])
 @login_required
 def save_admin_password():
-    """ Change the admin password """
+    """Change the admin password"""
     current_app.logger.warning("Changing administrator password")
     password = request.form.get("password")
     hashed = generate_password_hash(password)
@@ -182,16 +184,20 @@ def dump_users():
 def dump_db():
     """Downloads a compressed dump of the database"""
     current_app.logger.info("Database dump requested")
-    db = get_db()
-    with gzip.open(tempfile.NamedTemporaryFile().name, "wb") as f:
-        for line in db.iterdump():
-            f.write(f"{line}\n".encode())
+    dbpath = current_app.config.get("DATABASE")
 
+    # Nasty Workaround due to https://github.com/python/cpython/pull/9621
+    start = perf_counter()
+    out = subprocess.run(["sqlite3", dbpath, ".dump"], stdout=subprocess.PIPE)
+    dump = out.stdout
+
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(f"-- Dump Timestamp: {datetime.now()}\n".encode())
+        f.write(f"-- Dump took {perf_counter() - start} seconds\n".encode())
+        f.write(dump)
         f.flush()
 
-        return send_file(
-            f.name, as_attachment=True, attachment_filename="database.sql.gz"
-        )
+        return send_file(f.name, as_attachment=True, attachment_filename="database.sql")
 
 
 @bp.route("/dump/restore", methods=["GET", "POST"])
@@ -203,25 +209,35 @@ def restore_db():
         # check if the post request has the file part
         if "file" not in request.files:
             flash("Keine Datei!")
-            return redirect(url_for(request.url))
+            return redirect(request.referrer)
 
-        # Rename the old Database
-        close_db()
-        db_name = current_app.config.get("DATABASE")
-        os.rename(db_name, db_name + ".old")
+        blob = request.files["file"].read()
 
-        # Read the file into the database
-        file = request.files["file"]
+        if len(blob) == 0:
+            flash("Datei leer!")
+            return redirect(request.referrer)
 
-        data = gzip.decompress(file.read()).decode()
+        try:
+            # Rename the old Database
+            close_db()
+            dbpath = current_app.config.get("DATABASE")
+            current_app.logger.warning("Copying old Database")
+            os.rename(dbpath, dbpath + ".old")
 
-        with get_db() as con:
-            # BUG: https://github.com/python/cpython/pull/9621#issuecomment-867623231
-            con.execute("CREATE TABLE sqlite_sequence(name varchar(255), seq int);")
-            con.executescript(data)
+            # Restore from the given data
+            rc = subprocess.call(["sqlite3", dbpath, blob.decode()])
 
-        flash("Daten erfolgreich wiederhergestellt")
-        return redirect("/")
+            if rc != 0:
+                raise Exception("Could not restore from database")
+
+            flash("Daten erfolgreich wiederhergestellt")
+        except Exception as e:
+            # Restore the old file
+            os.rename(dbpath + ".old", dbpath)
+            flash(e)
+            return redirect(request.referrer)
+        finally:
+            return redirect(request.referrer)
 
 
 @bp.route("/login", methods=["GET", "POST"])
