@@ -5,12 +5,15 @@
 ################################################################################
 
 import os
+from typing import Iterator
 from kaffee_server.db import get_db
 from flask import current_app
 from flask_apscheduler import APScheduler
 from glob import iglob
 import filecmp
 from time import strftime, time
+from itertools import combinations
+from multiprocessing import Pool
 
 scheduler = APScheduler()
 
@@ -26,50 +29,63 @@ def vacuum_database():
 
 
 @scheduler.task("interval", days=1)
+def auto_backup():
+    with scheduler.app.app_context():
+        backup_database()
+
+
 def backup_database():
     """Saves an optimized copy of the database to instance folder"""
-    with scheduler.app.app_context():
-        backup_dir = current_app.config.get("BACKUP_DIR")
 
-        # Ensure the backup folder exists
-        os.makedirs(backup_dir, exist_ok=True)
+    backup_dir = current_app.config.get("BACKUP_DIR")
 
-        backup_file = os.path.join(
-            backup_dir, strftime("BACKUP-%Y-%m-%d-%H%M%S.sqlite")
-        )
+    # Ensure the backup folder exists
+    os.makedirs(backup_dir, exist_ok=True)
 
-        current_app.logger.info(f"Backing up to {backup_file}")
+    backup_file = os.path.join(backup_dir, strftime("BACKUP-%Y-%m-%d-%H%M%S.sqlite"))
 
-        with get_db() as db:
-            db.execute("VACUUM main INTO ?", (backup_file,))
+    current_app.logger.info(f"Backing up to {backup_file}")
 
-        current_app.logger.info(f"Finished backing up")
+    with get_db() as db:
+        db.execute("VACUUM main INTO ?", (backup_file,))
 
-        prune_backups(pattern="BACKUP-*.sqlite")
+    current_app.logger.info(f"Finished backing up")
+
+    prune_backups()
 
 
-def prune_backups(pattern="*"):
-    """Deduplicate the backup directory"""
+def list_backups() -> Iterator:
+    """Lists Backup files"""
+    backup_dir = current_app.config.get("BACKUP_DIR")
+    expr = backup_dir + os.path.sep + "BACKUP-*.sqlite"
+    return iglob(expr)
 
-    backup_dir = ""
 
-    with scheduler.app.app_context():
-        backup_dir = current_app.config.get("BACKUP_DIR")
+def remove_if_old(path: str):
+    """Remove files older than 1 year"""
+    month = 60 * 60 * 24 * 31
+    age = time() - os.path.getctime(path)
+    if age > month:
+        name = os.path.basename(path)
+        current_app.logger.warning(f"Removing old file {name}")
+        os.remove(path)
 
-    expr = backup_dir + os.path.sep + pattern
 
-    current_app.logger.debug(f"Pruning {expr}")
+def remove_duplicate(path1: str, path2: str):
+    """Compares and removes duplicates"""
+    if path1 != path2:
+        if filecmp.cmp(path1, path2, shallow=False):
+            name = os.path.basename(path2)
+            current_app.logger.warning(f"Removing identical backup file {name}")
+            os.remove(path2)
 
-    all_files = iglob(expr)
 
-    for i in all_files:
-        # Remove files older than 1 month
-        age = time() - os.path.getctime(i)
-        if age > 60 * 60 * 24 * 31:
-            current_app.logger.warning(f"Removing old file {i}")
-            os.remove(i)
-        for j in all_files:
-            if i != j and os.path.exists(i) and os.path.exists(j):
-                if filecmp.cmp(i, j, shallow=False):
-                    current_app.logger.warning(f"Removing identical backup file {i}")
-                    os.remove(i)
+def prune_backups():
+    """Prune unneeded files from the backup directory"""
+
+    with Pool() as p:
+        # Remove very old files first
+        p.map(remove_if_old, list_backups())
+
+        # Remove identical backup files
+        p.starmap(remove_duplicate, combinations(list_backups(), 2))
