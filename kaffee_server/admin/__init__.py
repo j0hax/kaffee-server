@@ -35,8 +35,6 @@ from kaffee_server.users import (
 import subprocess
 import time
 import csv
-from time import perf_counter
-from datetime import datetime
 import tempfile
 import os
 
@@ -187,13 +185,10 @@ def dump_db():
     dbpath = current_app.config.get("DATABASE")
 
     # Nasty Workaround due to https://github.com/python/cpython/pull/9621
-    start = perf_counter()
     out = subprocess.run(["sqlite3", dbpath, ".dump"], stdout=subprocess.PIPE)
     dump = out.stdout
 
     with tempfile.NamedTemporaryFile() as f:
-        f.write(f"-- Dump Timestamp: {datetime.now()}\n".encode())
-        f.write(f"-- Dump took {perf_counter() - start} seconds\n".encode())
         f.write(dump)
         f.flush()
 
