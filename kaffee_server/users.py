@@ -4,6 +4,7 @@
 ## Arbeitet mit der Datenbank zur Kontomanipulation
 ################################################################################
 
+from itertools import product
 from time import perf_counter
 from flask import current_app
 from kaffee_server.db import get_db
@@ -51,6 +52,27 @@ def get_user(id: int, sensitive=True) -> dict:
         return dict(result)
 
 
+def create_user(result: dict, sensitive: bool) -> dict:
+    """Translates a database result into a user dict"""
+    user_data = {
+        "id": result["userid"],
+        "vip": bool(result["vip"]),
+        "name": result["name"],
+        "balance": result["balance"] or 0,
+        "lastUpdate": result["last_update"],
+    }
+
+    # Include sensitive data if requested
+    if sensitive:
+        user_data["transponder"] = result["transponder_code"]
+        user_data["withdrawals"] = result["withdrawal_count"] or 0
+        user_data["deposits"] = result["deposit_count"] or 0
+        user_data["withdrawalTotal"] = result["withdrawals"] or 0
+        user_data["depositTotal"] = result["deposits"] or 0
+
+    return user_data
+
+
 def get_users(sensitive=True) -> dict:
     """Return a list of users
 
@@ -61,31 +83,15 @@ def get_users(sensitive=True) -> dict:
     cur.execute(
         "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id > 0;"
     )
-    results = cur.fetchall()
-    array = []
-    for result in results:
-        user_data = {
-            "id": result["userid"],
-            "vip": bool(result["vip"]),
-            "name": result["name"],
-            "balance": result["balance"] or 0,
-            "lastUpdate": result["last_update"],
-        }
 
-        # Include sensitive data if requested
-        if sensitive:
-            user_data["transponder"] = result["transponder_code"]
-            user_data["withdrawals"] = result["withdrawal_count"] or 0
-            user_data["deposits"] = result["deposit_count"] or 0
-            user_data["withdrawalTotal"] = result["withdrawals"] or 0
-            user_data["depositTotal"] = result["deposits"] or 0
+    # Probably inefficient, as this has serial overhead and then everything is fork()'ed
+    results = [dict(row) for row in cur.fetchall()]
 
-        array.append(user_data)
+    with Pool() as pool:
+        array = pool.starmap(create_user, product(results, [sensitive]))
 
     # Sort by VIP Status, then activity
-    users_s = sorted(array, key=lambda x: (-x["vip"], -x["lastUpdate"]))
-
-    return users_s
+    return sorted(array, key=lambda x: (-x["vip"], -x["lastUpdate"]))
 
 
 def insert_user(user: dict):
