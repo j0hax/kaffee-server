@@ -83,7 +83,7 @@ def get_users(sensitive=True) -> dict:
         array.append(user_data)
 
     # Sort by VIP Status, then activity
-    users_s = sorted(array, key=lambda x: (-x["vip"], x["last_update"]))
+    users_s = sorted(array, key=lambda x: (-x["vip"], x["lastUpdate"]))
 
     return users_s
 
