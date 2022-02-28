@@ -66,7 +66,7 @@ def get_users(sensitive=True) -> dict:
     for result in results:
         user_data = {
             "id": result["userid"],
-            "vip": result["vip"] or False,
+            "vip": bool(result["vip"]),
             "name": result["name"],
             "balance": result["balance"] or 0,
             "lastUpdate": result["last_update"],
