@@ -1,6 +1,7 @@
 -- User database
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    vip INTEGER DEFAULT FALSE,
     name TEXT NOT NULL,
     last_update REAL DEFAULT (strftime('%s','now')),
     transponder_code TEXT UNIQUE

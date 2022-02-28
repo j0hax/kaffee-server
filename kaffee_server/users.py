@@ -59,13 +59,14 @@ def get_users(sensitive=True) -> dict:
     current_app.logger.debug(f"Retrieving users, include sensitive data: {sensitive}")
     cur = get_db().cursor()
     cur.execute(
-        "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id > 0 ORDER BY withdrawal_count DESC;"
+        "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id > 0;"
     )
     results = cur.fetchall()
     array = []
     for result in results:
         user_data = {
             "id": result["userid"],
+            "vip": result["vip"] or False,
             "name": result["name"],
             "balance": result["balance"] or 0,
             "lastUpdate": result["last_update"],
@@ -81,7 +82,10 @@ def get_users(sensitive=True) -> dict:
 
         array.append(user_data)
 
-    return array
+    # Sort by VIP Status, then activity
+    users_s = sorted(array, key=lambda x: (-x["vip"], x["last_update"]))
+
+    return users_s
 
 
 def insert_user(user: dict):
@@ -95,8 +99,9 @@ def insert_user(user: dict):
             # update our user
             current_app.logger.info(f"Updating user {user['name']}")
             cur.execute(
-                "UPDATE users SET name=?,transponder_code=? WHERE id=?",
+                "UPDATE users SET vip=?, name=?, transponder_code=? WHERE id=?",
                 (
+                    user["vip"],
                     user["name"],
                     user["transponder"],
                     user["id"],
@@ -105,8 +110,9 @@ def insert_user(user: dict):
     else:
         current_app.logger.info(f"Inserting new user {user['name']}")
         cur.execute(
-            "INSERT INTO users (name, last_update, transponder_code) VALUES (?,?,?)",
+            "INSERT INTO users (vip, name, last_update, transponder_code) VALUES (?, ?,?,?)",
             (
+                user["vip"],
                 user["name"],
                 user["lastUpdate"],
                 user["transponder"],

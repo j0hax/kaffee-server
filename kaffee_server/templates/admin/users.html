@@ -4,43 +4,41 @@
 <table class="uk-table uk-table-hover">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Kartennr.</th>
-            <th>Neu Einzahlen (€)</th>
-            <th>Saldo</th>
+            <th class="uk-table-shrink">ID</th>
+            <th class="uk-table-shrink">VIP</th>
+            <th class="uk-table-expand">Name</th>
+            <th class="uk-table-expand">Kartennr.</th>
+            <th class="uk-table-expand">Neu Einzahlen (€)</th>
+            <th class="uk-table-expand">Saldo</th>
             <th>
             </th>
         </tr>
     </thead>
     <tbody>
-        {% for user in users | sort(attribute='name') %}
-        <form action="/admin/save/user" method="post">
+        {% for user in users %}
+        <form action="/admin/save/user" method="post" class="uk-form-horizontal">
             <tr>
-                <td><input type="text" name="id" value="{{ user.id }}" class="uk-input uk-form-blank uk-width-expand"
-                        readonly></td>
-                <td><input type="text" name="name" value="{{ user.name }}"
-                        class="uk-input uk-form-blank uk-width-expand" required></td>
+                <td>{{ user.id }}</td>
+                <td><input class="uk-checkbox" type="checkbox" name="vip" {% if user.vip %} checked {% endif %}></td>
+                <td><input type="text" name="name" value="{{ user.name }}" class="uk-input uk-form-blank uk-form-small"
+                        required></td>
                 <td><input type="text" name="transponder_code" value="{{ user.transponder }}"
-                        class="uk-input uk-form-blank uk-width-expand"></td>
+                        class="uk-input uk-form-blank uk-form-small"></td>
                 <td><input type="number" name="payment" value="0" step="0.01"
-                        class="uk-input uk-form-blank uk-width-expand" required>
+                        class="uk-input uk-form-blank uk-form-small" required>
                 </td>
                 <td>{{ user.balance | pretty_currency }}</td>
                 <td>
-                    <div class="uk-button-group uk-width-expand">
-                        <button type="submit" name="action" value="save"
-                            class="uk-button uk-button-primary uk-width-expand">
+                    <div class="uk-button-group uk-button-small">
+                        <button type="submit" name="action" value="save" class="uk-button uk-button-primary">
                             <span uk-icon="check"></span>
                         </button>
                         <button type="submit" name="action" value="undo"
-                            onclick="return confirm('Letze Transaktion löschen?')"
-                            class="uk-button uk-button-default uk-width-expand">
+                            onclick="return confirm('Letze Transaktion löschen?')" class="uk-button uk-button-default">
                             <span uk-icon="history"></span>
                         </button>
                         <button type="submit" name="action" value="delete"
-                            onclick="return confirm('Nutzer permanent löschen?')"
-                            class="uk-button uk-button-danger uk-width-expand">
+                            onclick="return confirm('Nutzer permanent löschen?')" class="uk-button uk-button-danger">
                             <span uk-icon="trash"></span>
                         </button>
                     </div>
@@ -50,16 +48,18 @@
         {% endfor %}
         <form action="/admin/save/user" method="post">
             <tr>
-                <td><input type="text" name="id" value="-" class="uk-input uk-form-blank uk-width-expand" readonly></td>
+                <td></td>
+                <td><input class="uk-checkbox" type="checkbox" name="vip"></td>
                 <td><input type="text" name="name" placeholder="Neuer Benutzer"
-                        class="uk-input uk-form-blank uk-width-expand" required></td>
+                        class="uk-input uk-form-blank uk-form-small" required>
+                </td>
                 <td><input type="text" name="transponder_code" placeholder="Transpondercode"
-                        class="uk-input uk-form-blank uk-width-expand"></td>
-                <td><input type="text" placeholder="-" class="uk-input uk-form-blank uk-width-expand" readonly></td>
-                <td><input type="text" placeholder="-" class="uk-input uk-form-blank uk-width-expand" readonly></td>
+                        class="uk-input uk-form-blank uk-form-small"></td>
+                <td>-</td>
+                <td>-</td>
                 <td>
                     <button type="submit" name="action" value="save"
-                        class="uk-button uk-button-primary uk-width-expand">
+                        class="uk-button uk-button-primary uk-button-small">
                         <span uk-icon="plus"></span>
                     </button>
                 </td>

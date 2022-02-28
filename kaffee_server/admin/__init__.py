@@ -123,6 +123,7 @@ def save_transaction():
 @login_required
 def save_table():
     user_id = request.form.get("id")
+    vipstatus = request.form.get("vip") == "on"
     user_name = request.form.get("name")
     action = request.form.get("action")
 
@@ -140,6 +141,7 @@ def save_table():
     user = [
         {
             "id": user_id,
+            "vip": vipstatus,
             "name": user_name,
             "lastUpdate": time.time(),
             "transponder": request.form.get("transponder_code"),
