@@ -12,7 +12,7 @@ from kaffee_server.users import get_users, insert_transactions
 from kaffee_server.db import get_db
 from time import time
 from flask import request, current_app
-import kaffee_server.api.v1 as v1
+from . import v1
 
 from uuid import uuid4
 
