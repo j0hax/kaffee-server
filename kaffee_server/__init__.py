@@ -59,10 +59,12 @@ def create_app(test_config=None):
 
     # Set up the logger
     logfile = os.path.join(app.instance_path, "server.log")
-    filelogger = logging.FileHandler(logfile, encoding="utf-8")
+    filelogger = logging.FileHandler(logfile)
+    formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s")
+    filelogger.setFormatter(formatter)
+    app.logger.addHandler(filelogger)
     # Allow for overriding the default level
     pref_level = os.environ.get("LOGLEVEL", logging.INFO)
-    app.logger.addHandler(filelogger)
     app.logger.setLevel(pref_level)
 
     # Initialize the database
