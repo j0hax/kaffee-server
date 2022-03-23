@@ -23,7 +23,7 @@ from kaffee_server.users import get_users
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-locale.setlocale(locale.LC_ALL, "de_DE")
+locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
 
 
 def create_app(test_config=None):

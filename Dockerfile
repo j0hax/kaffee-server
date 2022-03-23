@@ -2,15 +2,13 @@ FROM python:3-slim
 
 WORKDIR /usr/src/app
 
-# Install and set locales and dependencies
-RUN apt-get update
-RUN apt-get install -y locales locales-all curl libev-dev gcc sqlite3
+RUN apt-get update -y && apt-get -y install locales build-essential libev-dev && \
+    sed -i -e "s/# de_DE.UTF-8 UTF-8/de_DE.UTF-8 UTF-8/" /etc/locale.gen && \
+    locale-gen
 
-ENV LC_ALL="de_DE.UTF-8"
 ENV TZ="Europe/Berlin"
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
-ENV PATH="/root/.local/bin:${PATH}"
+RUN pip install poetry
 
 COPY . .
 
