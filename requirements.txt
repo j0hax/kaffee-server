@@ -1,8 +1,0 @@
-Flask
-Flask_Login
-Flask_Cors
-python_bcrypt
-bjoern
-toml
-Flask-APScheduler
-flask-talisman
