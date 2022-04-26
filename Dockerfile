@@ -2,7 +2,7 @@ FROM python:3-slim
 
 WORKDIR /usr/src/app
 
-RUN apt-get update -y && apt-get -y install locales build-essential libev-dev && \
+RUN apt-get update -y && apt-get -y install sqlite3 locales build-essential libev-dev && \
     sed -i -e "s/# de_DE.UTF-8 UTF-8/de_DE.UTF-8 UTF-8/" /etc/locale.gen && \
     locale-gen
 
