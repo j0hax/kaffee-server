@@ -8,7 +8,7 @@ CREATE TABLE users (
 );
 
 -- User ID 0 is a special system user
-INSERT INTO users (id, name) VALUES (0, "System");
+INSERT INTO users (id, name) VALUES (0, "Tresor");
 
 -- Transactions from users
 CREATE TABLE transactions (
