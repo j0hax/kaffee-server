@@ -110,7 +110,7 @@ def save_admin_password():
 def save_transaction():
     data = {
         "user": 0,
-        "amount": -(int(request.form.get("amount")) * 100),
+        "amount": -(int(float(request.form.get("amount")) * 100)),
         "description": f"[{request.form.get('user')}] {request.form.get('description')}",
         "timestamp": time.time(),
     }
