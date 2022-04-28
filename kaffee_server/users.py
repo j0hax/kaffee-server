@@ -73,6 +73,19 @@ def create_user(result: dict, sensitive: bool) -> dict:
     return user_data
 
 
+def get_user(id: int, sensitive=True) -> dict:
+    with get_db() as cur:
+        result = cur.execute(
+            "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id = ?",
+            (id,),
+        ).fetchone()
+
+    if result is None:
+        raise ValueError("User ID does not exist")
+    else:
+        return create_user(result, sensitive)
+
+
 def get_users(sensitive=True) -> dict:
     """Return a list of users
 
