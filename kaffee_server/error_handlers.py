@@ -18,7 +18,7 @@ def http_error(e):
     if e.code < 500:
         current_app.logger.warn(msg)
     else:
-        current_app.logger.error(msg)
+        current_app.logger.exception(e)
 
     return render_template("errorpages/http.html", e=e, id=e_id), e.code
 
@@ -28,7 +28,7 @@ def handle_sql(e):
     """SQLite related errors"""
     # Log to a certain error ID
     e_id = uuid4()
-    current_app.logger.warn(f"SQL Error")
+    current_app.logger.exception(e)
 
     return render_template("errorpages/sql.html", e=e, id=e_id), 409
 
@@ -38,7 +38,7 @@ def handle_exception(e):
 
     # Log to a certain error ID
     e_id = uuid4()
-    current_app.logger.critical(f"{e}")
+    current_app.logger.exception(e)
 
     # now you're handling non-HTTP exceptions only
     return render_template("errorpages/generic.html", e=e, id=e_id), 500
