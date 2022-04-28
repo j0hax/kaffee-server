@@ -32,26 +32,6 @@ def undo_transaction(id: int):
         )
 
 
-def get_user(id: int, sensitive=True) -> dict:
-    if sensitive:
-        with get_db() as cur:
-            result = cur.execute(
-                "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id = ?",
-                id,
-            ).fetchone()
-    else:
-        with get_db() as cur:
-            result = cur.execute(
-                "SELECT users.id AS userid, * FROM users WHERE users.id = ?",
-                id,
-            )
-
-    if result is None:
-        raise ValueError("User ID does not exist")
-    else:
-        return dict(result)
-
-
 def create_user(result: dict, sensitive: bool) -> dict:
     """Translates a database result into a user dict"""
     user_data = {
@@ -163,10 +143,10 @@ def get_transactions(limit=10) -> dict:
 
 
 def sum_transactions() -> int:
-    """Sums all transactions"""
+    """Sums all user transactions. Note that the Tresor balance is excluded."""
     start_time = perf_counter()
     cur = get_db().cursor()
-    cur.execute("SELECT SUM(amount) from transactions;")
+    cur.execute("SELECT IFNULL(SUM(amount), 0) from transactions WHERE user > 0;")
     current_app.logger.debug(
         f"Summing all transactions took {perf_counter() - start_time} milliseconds"
     )
