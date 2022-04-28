@@ -23,6 +23,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from kaffee_server.db import get_db, close_db
 from kaffee_server.users import (
+    get_user,
     get_users,
     merge_users,
     get_transactions,
@@ -71,6 +72,8 @@ def transactions():
         admin=g.user,
         balance=sum_transactions(),
         transactions=get_transactions(limit=100),
+        users=get_users(),
+        tresor=get_user(0),
     )
 
 
