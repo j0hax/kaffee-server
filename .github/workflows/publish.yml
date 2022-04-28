@@ -9,7 +9,8 @@ on:
   push:
     branches:    
       - 'main'
-
+  schedule:
+    - cron: '0 0 * * *'
 jobs:
   push_to_registries:
     name: Push Docker image to multiple registries
