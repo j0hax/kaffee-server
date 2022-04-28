@@ -1,10 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Kasse{% endblock %}
+{% block title %}Kasse & Tresor{% endblock %}
 {% block content %}
-<h3>Kassenbestand: {{ balance | pretty_currency }}</h3>
-<h3>Einzahlungen: {{ users | sum(attribute='deposits') | pretty_number }}</h3>
-<h3>Neue Kassenauszahlung</h3>
-<p class="uk-text-meta">Für eine arbiträre Einzahlung, einen negativen Betrag eingeben.</p>
+<h3>Kasse: {{ balance | pretty_currency }}</h3>
+<p>Der Kassenbetrag wird durch die Summierung aller Nutzersalden berechnet.</p>
+<h4>Soll: {{ users | selectattr("balance", "lessthan", 0) | sum(attribute='balance') | abs | pretty_currency }}
+    &bull; Haben: {{ users | selectattr("balance", "greaterthan", 0) | sum(attribute='balance') | abs | pretty_currency
+    }}</h4>
+<p>Der <em>Sollwert</em> ist die Summe aller Schulden der Nutzer. Der <em>Habwert</em> ist die
+    Summe aller positiven Nutzersalden.</p>
+<h3>Tresorbestand: {{ tresor.balance | pretty_currency }}</h3>
+<h4>Einzahlungen: {{ tresor.depositTotal | abs | pretty_currency }} &bull; Auszahlungen: {{ tresor.withdrawalTotal | abs
+    |
+    pretty_currency }}</h4>
+<p>Der Tresorbetrag wird seperat von den Nutzerkonten geführt.</p>
 <form class="uk-form-horizontal uk-margin" action="/admin/save/transaction" method="post">
     <div class="uk-margin">
         <label class="uk-form-label" for="form-name">Name</label>
@@ -13,9 +21,10 @@
         </div>
     </div>
     <div class="uk-margin">
-        <label class="uk-form-label" for="form-amount">Betrag</label>
+        <label class="uk-form-label" for="form-amount">Betrag (€)</label>
         <div class="uk-form-controls">
             <input class="uk-input" id="form-amount" type="number" name="amount" value="0" step="0.01" required>
+            <p class="uk-text-meta">Für eine arbiträre Einzahlung, einen negativen Betrag eingeben.</p>
         </div>
     </div>
     <div class="uk-margin">
