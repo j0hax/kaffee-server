@@ -3,11 +3,9 @@
 {% block content %}
 <h3>Kasse: {{ balance | pretty_currency }}</h3>
 <p>Der Kassenbetrag wird durch die Summierung aller Nutzersalden berechnet.</p>
-<h4>Soll: {{ users | selectattr("balance", "lessthan", 0) | sum(attribute='balance') | abs | pretty_currency }}
-    &bull; Haben: {{ users | selectattr("balance", "greaterthan", 0) | sum(attribute='balance') | abs | pretty_currency
-    }}</h4>
-<p>Der <em>Sollwert</em> ist die Summe aller Schulden der Nutzer. Der <em>Habwert</em> ist die
-    Summe aller positiven Nutzersalden.</p>
+<h4>Aussehend: {{ users | selectattr("balance", "lessthan", 0) | sum(attribute='balance') | abs | pretty_currency }}
+</h4>
+<p>Der <em>ausstehende</em> Wert berechnet sich durch die Summierung aller negativen Nutzersalden.
 <h3>Tresorbestand: {{ tresor.balance | pretty_currency }}</h3>
 <h4>Einzahlungen: {{ tresor.depositTotal | abs | pretty_currency }} &bull; Auszahlungen: {{ tresor.withdrawalTotal | abs
     |
