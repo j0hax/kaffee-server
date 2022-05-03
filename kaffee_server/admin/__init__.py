@@ -23,7 +23,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from kaffee_server.db import get_db, close_db
 from kaffee_server.users import (
-    get_user,
+    get_user_from_name,
     get_users,
     merge_users,
     get_transactions,
@@ -70,10 +70,12 @@ def transactions():
     return render_template(
         "admin/transactions.html",
         admin=g.user,
+        config=current_app.config,
         balance=sum_transactions(),
         transactions=get_transactions(limit=100),
         users=get_users(),
-        tresor=get_user(0),
+        tresor=get_user_from_name("Tresor"),
+        kasse=get_user_from_name("Kasse"),
     )
 
 
@@ -112,8 +114,8 @@ def save_admin_password():
 @login_required
 def save_transaction():
     data = {
-        "user": 0,
-        "amount": -(int(float(request.form.get("amount")) * 100)),
+        "user": int(request.form.get("account")),
+        "amount": (int(float(request.form.get("amount")) * 100)),
         "description": f"[{request.form.get('user')}] {request.form.get('description')}",
         "timestamp": time.time(),
     }

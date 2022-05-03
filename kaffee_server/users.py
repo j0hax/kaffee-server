@@ -54,6 +54,7 @@ def create_user(result: dict, sensitive: bool) -> dict:
 
 
 def get_user(id: int, sensitive=True) -> dict:
+    """Fetch a user by their ID"""
     with get_db() as cur:
         result = cur.execute(
             "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id = ?",
@@ -61,20 +62,34 @@ def get_user(id: int, sensitive=True) -> dict:
         ).fetchone()
 
     if result is None:
-        raise ValueError("User ID does not exist")
+        raise ValueError(f"User with ID '{id}' does not exist")
+    else:
+        return create_user(result, sensitive)
+
+
+def get_user_from_name(name: str, sensitive=True) -> dict:
+    """Like 'get_user()' but fetches by the name instead of ID"""
+    with get_db() as cur:
+        result = cur.execute(
+            "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.name LIKE ?",
+            (name,),
+        ).fetchone()
+
+    if result is None:
+        raise ValueError(f"User with name '{name}' does not exist")
     else:
         return create_user(result, sensitive)
 
 
 def get_users(sensitive=True) -> dict:
-    """Return a list of users
+    """Return a list of non-system users
 
     These can be directly converted to JSON for the client or used for further processing.
     """
     current_app.logger.debug(f"Retrieving users, include sensitive data: {sensitive}")
     cur = get_db().cursor()
     cur.execute(
-        "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.id > 0;"
+        "SELECT users.id AS userid, * FROM users LEFT JOIN balances ON users.id = balances.id WHERE users.system = FALSE;"
     )
 
     # Probably inefficient, as this has serial overhead and then everything is fork()'ed
@@ -143,10 +158,12 @@ def get_transactions(limit=10) -> dict:
 
 
 def sum_transactions() -> int:
-    """Sums all user transactions. Note that the Tresor balance is excluded."""
+    """Sums all user transactions. Note that system users are excluded."""
     start_time = perf_counter()
     cur = get_db().cursor()
-    cur.execute("SELECT IFNULL(SUM(amount), 0) from transactions WHERE user > 0;")
+    cur.execute(
+        "SELECT IFNULL(SUM(amount), 0) from transactions WHERE user in (SELECT id FROM users WHERE system = FALSE);"
+    )
     current_app.logger.debug(
         f"Summing all transactions took {perf_counter() - start_time} milliseconds"
     )

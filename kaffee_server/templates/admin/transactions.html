@@ -1,28 +1,38 @@
 {% extends "base.html" %}
 {% block title %}Kasse & Tresor{% endblock %}
 {% block content %}
-<h3>Kasse: {{ balance | pretty_currency }}</h3>
-<p>Der Kassenbetrag wird durch die Summierung aller Nutzersalden berechnet.</p>
-<h4>Aussehend: {{ users | selectattr("balance", "lessthan", 0) | sum(attribute='balance') | abs | pretty_currency }}
-</h4>
-<p>Der <em>ausstehende</em> Wert berechnet sich durch die Summierung aller negativen Nutzersalden.
-<h3>Tresorbestand: {{ tresor.balance | pretty_currency }}</h3>
-<h4>Einzahlungen: {{ tresor.depositTotal | abs | pretty_currency }} &bull; Auszahlungen: {{ tresor.withdrawalTotal | abs
-    |
-    pretty_currency }}</h4>
-<p>Der Tresorbetrag wird seperat von den Nutzerkonten geführt.</p>
+<h2 class="uk-heading-line"><span>Kasse</span></h2>
+<h3>Bestand: {{ (balance + kasse.balance) | pretty_currency }} &bull; Ausstehend: {{ users | selectattr("balance",
+    "lessthan", 0) | sum(attribute='balance') | abs | pretty_currency }}</h3>
+<p>Der Kassenbetrag wird durch die Summierung aller Nutzersalden plus arbiträre Ein- oder Auszahlungen der Kasse
+    berechnet.</p>
+<p>Der ausstehende Wert berechnet sich durch die Summierung aller negativen Nutzersalden.</p>
+<h2 class="uk-heading-line"><span>Ein- und Auszahlung Betätigen</span></h2>
 <form class="uk-form-horizontal uk-margin" action="/admin/save/transaction" method="post">
+    <div class="uk-margin">
+        <label class="uk-form-label" for="form-account">Konto</label>
+        <div class="uk-form-controls">
+            <select id="form-account" class="uk-select" name="account">
+                <option value="{{ kasse.id }}">{{ kasse.name }}</option>
+                <option value="{{ tresor.id }}">{{ tresor.name }}</option>
+            </select>
+            <p class="uk-text-meta">Die Kasse steht für kleinere Ein- oder Ausgaben zur Verfügung, wie
+                zum Beispiel der Kauf von neuen Kaffeebohnen. Der Tresor hingegen dient als langfristige
+                Geldablage und wird nirgends sonst mitgerechnet.
+            </p>
+        </div>
+    </div>
     <div class="uk-margin">
         <label class="uk-form-label" for="form-name">Name</label>
         <div class="uk-form-controls">
-            <input class="uk-input" id="form-name" type="text" name="user" value="Administrator" required>
+            <input class="uk-input" id="form-name" type="text" name="user" value="{{config.CONTACT.name}}" required>
         </div>
     </div>
     <div class="uk-margin">
         <label class="uk-form-label" for="form-amount">Betrag (€)</label>
         <div class="uk-form-controls">
             <input class="uk-input" id="form-amount" type="number" name="amount" value="0" step="0.01" required>
-            <p class="uk-text-meta">Für eine arbiträre Einzahlung, einen negativen Betrag eingeben.</p>
+            <p class="uk-text-meta"><strong>Hinweis:</strong> zum abbuchen hier einen negativen Betrag eingeben.</p>
         </div>
     </div>
     <div class="uk-margin">
@@ -34,9 +44,15 @@
     </div>
 
     <button type="submit" class="uk-button uk-button-primary uk-margin"><span class="uk-margin-small-right"
-            uk-icon="check"></span>Speichern</button>
+            uk-icon="check"></span>Buchen</button>
 </form>
-<h3>Letzten {{transactions | length}} Transaktionen</h3>
+<h2 class="uk-heading-line"><span>Tresor</span></h2>
+<h3>Bestand: {{ tresor.balance | pretty_currency }}</h3>
+<h4>Einzahlungen: {{ tresor.depositTotal | abs | pretty_currency }} &bull; Auszahlungen: {{ tresor.withdrawalTotal | abs
+    |
+    pretty_currency }}</h4>
+<p>Der Tresor wird seperat von den Nutzersalden und Kasse geführt.</p>
+<h2 class="uk-heading-line"><span>Letzten {{transactions | length}} Transaktionen</span></h2>
 <table class="uk-table uk-table-hover">
     <thead>
         <tr>

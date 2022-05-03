@@ -1,14 +1,15 @@
 -- User database
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    vip INTEGER DEFAULT FALSE,
+    vip BOOLEAN DEFAULT FALSE,
+    system BOOLEAN DEFAULT FALSE,
     name TEXT NOT NULL,
     last_update REAL DEFAULT (strftime('%s','now')),
     transponder_code TEXT UNIQUE
 );
 
--- User ID 0 is a special system user
-INSERT INTO users (id, name) VALUES (0, "Tresor");
+-- User IDs 0 and 1 are special system users
+INSERT INTO users (name, system) VALUES ("Kasse", TRUE), ("Tresor", TRUE);
 
 -- Transactions from users
 CREATE TABLE transactions (
