@@ -157,6 +157,24 @@ def get_transactions(limit=10) -> dict:
     return cur.fetchall()
 
 
+def total_intake() -> int:
+    """The sum of money paid by non-system users"""
+    cur = get_db().cursor()
+    cur.execute(
+        "SELECT SUM(amount) from transactions WHERE user in (SELECT id FROM users WHERE system = FALSE) AND amount > 0;"
+    )
+    return cur.fetchone()[0] or 0
+
+
+def sum_debt() -> int:
+    """The sum of balances of users in debt"""
+    cur = get_db().cursor()
+    cur.execute(
+        "SELECT SUM(balance) from balances WHERE id in (SELECT id FROM users WHERE system = FALSE) AND balance < 0;"
+    )
+    return cur.fetchone()[0] or 0
+
+
 def sum_transactions() -> int:
     """Sums all user transactions. Note that system users are excluded."""
     start_time = perf_counter()

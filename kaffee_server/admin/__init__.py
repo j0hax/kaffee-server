@@ -29,7 +29,9 @@ from kaffee_server.users import (
     get_transactions,
     insert_transaction,
     delete_user,
+    sum_debt,
     sum_transactions,
+    total_intake,
     undo_transaction,
 )
 
@@ -71,7 +73,8 @@ def transactions():
         "admin/transactions.html",
         admin=g.user,
         config=current_app.config,
-        balance=sum_transactions(),
+        intake=total_intake(),
+        debts=sum_debt(),
         transactions=get_transactions(limit=100),
         users=get_users(),
         tresor=get_user_from_name("Tresor"),

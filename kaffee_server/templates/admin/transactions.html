@@ -2,10 +2,10 @@
 {% block title %}Kasse & Tresor{% endblock %}
 {% block content %}
 <h2 class="uk-heading-line"><span>Kasse</span></h2>
-<h3>Bestand: {{ (balance + kasse.balance) | pretty_currency }} &bull; Ausstehend: {{ users | selectattr("balance",
-    "lessthan", 0) | sum(attribute='balance') | abs | pretty_currency }}</h3>
-<p>Der Kassenbetrag wird durch die Summierung aller Nutzersalden plus arbiträre Ein- oder Auszahlungen der Kasse
-    berechnet.</p>
+<h3>Bestand: {{ (intake + kasse.balance) | pretty_currency }} &bull; Ausstehend: {{ debts | abs | pretty_currency }}
+</h3>
+<p>Der Kassenbestand wird durch die Summierung aller Nutzereinzahlungen plus arbiträre Ein- oder Auszahlungen der
+    Kasse berechnet.</p>
 <p>Der ausstehende Wert berechnet sich durch die Summierung aller negativen Nutzersalden.</p>
 <h2 class="uk-heading-line"><span>Ein- und Auszahlung Betätigen</span></h2>
 <form class="uk-form-horizontal uk-margin" action="/admin/save/transaction" method="post">
