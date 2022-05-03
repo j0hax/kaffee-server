@@ -97,7 +97,7 @@ def create_app(test_config=None):
     @app.template_filter("pretty_currency")
     def pretty_currency(cents: int) -> str:
         """Formats an amount of cents as a localized String"""
-        return locale.currency(from_cents(cents))
+        return locale.currency(from_cents(cents), grouping=True)
 
     @app.template_filter("pretty_date")
     def pretty_date(timestamp: float) -> str:
