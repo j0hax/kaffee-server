@@ -12,7 +12,7 @@ Flask-Cors = "^3.0.10"
 python-bcrypt = "^0.3.2"
 bjoern = "^3.2.1"
 toml = "^0.10.2"
-Flask-APScheduler = "^1.12.3"
+Flask-APScheduler = "^1.12.4"
 flask-talisman = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
