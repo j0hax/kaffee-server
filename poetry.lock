@@ -116,7 +116,7 @@ dotenv = ["python-dotenv"]
 
 [[package]]
 name = "flask-apscheduler"
-version = "1.12.3"
+version = "1.12.4"
 description = "Adds APScheduler support to Flask"
 category = "main"
 optional = false
@@ -419,7 +419,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "7b7987c2f01ac9384664235f7ac927b5db8a48043a701dd10f34c2ecfcd93399"
+content-hash = "ccb9cb55440f9111a9957f1a56fbc1816ba24b439b65cedfe7861bee3a80e1c1"
 
 [metadata.files]
 apscheduler = [
@@ -472,7 +472,7 @@ flask = [
     {file = "Flask-2.0.3.tar.gz", hash = "sha256:e1120c228ca2f553b470df4a5fa927ab66258467526069981b3eb0a91902687d"},
 ]
 flask-apscheduler = [
-    {file = "Flask-APScheduler-1.12.3.tar.gz", hash = "sha256:d60948d1f2be9eb4772f68c3308ba3f973755219d13947266f89292ad6df63fc"},
+    {file = "Flask-APScheduler-1.12.4.tar.gz", hash = "sha256:681dae34dc6cc9403ce674795e53abd0bff540472129cfd3d3c93e0e1d502da8"},
 ]
 flask-cors = [
     {file = "Flask-Cors-3.0.10.tar.gz", hash = "sha256:b60839393f3b84a0f3746f6cdca56c1ad7426aa738b70d6c61375857823181de"},
