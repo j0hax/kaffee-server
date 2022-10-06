@@ -1,12 +1,22 @@
-version: "3.7"
+version: '3.7'
 services:
+    cache:
+        image: varnish:stable
+        volumes:
+            - "./default.vcl:/etc/varnish/default.vcl"
+        ports:
+            - "5000:80"
+        tmpfs:
+            - /var/lib/varnish:exec
+        environment:
+            - VARNISH_SIZE=2G
+        depends_on:
+            - "server"
     server:
         restart: unless-stopped
         build: .
-        ports:
-            - "5000:5000"
         volumes:
-            - instance:/usr/src/app/instance
+            - 'instance:/usr/src/app/instance'
 
 volumes:
-    instance:
+    instance: null
